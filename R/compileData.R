@@ -22,12 +22,16 @@
 #' sep.type=",", save=TRUE, remove.duplicates=T, save.duplicates=F)
 #' }
 #' @export
-#' @importFrom here "here"
+#'
+#' @importFrom here here
+#' @import crayon
+#' @importFrom lubridate parse_date_time
+#'
+#' @importFrom utils View read.table write.table
 #'
 #'
 
-##this is using: View, gsub, scan, Sys.time, cat, read.table, dir, c, length,
-##as.character, as.numeric, repeat, break, for, ncol, exists, if,
+#gsub scan Sys.time cat dir c length as.character as.numeric repeat break for ncol exists if
 
 ##package: here::here
 
@@ -626,7 +630,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
 
 
   if (remove.duplicates==T){
-    duplicates<<-detects[duplicated(detects[,c("Transmitter","Receiver","Date.and.Time")]),]
+    duplicates<-detects[duplicated(detects[,c("Transmitter","Receiver","Date.and.Time")]),]
     cat("We found", nrow(duplicates), "duplicates found in your data. (Out of ", nrow(detects),", which is approx.",round(nrow(duplicates)/nrow(detects)*100), "%)", " \n")
     if (save.duplicates==T){
       write.table(duplicates, here::here(detection.folder, paste0("ATfiltR_duplicates_", Sys.Date(),".txt")), sep=sep.type, row.names=F)
@@ -634,10 +638,12 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
     }
     cat("Removing duplicates from the compiled data...", " \n")
     if (nrow(duplicates)>0){
-      detects<-detects[!duplicated(detects[,c("Transmitter","Receiver","Date.and.Time")]),]}
+      detects<-detects[!duplicated(detects[,c("Transmitter","Receiver","Date.and.Time")]),]
+      return(duplicates)}
   }
 
-  data.compiled<<-detects
+  data.compiled<-detects
+  return(data.compiled)
 
   if (save==TRUE){
     cat("Saving the compiled file...", " \n")
