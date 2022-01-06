@@ -89,7 +89,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
   visual<-read.table(here::here(detection.folder,files[1]),header=F,fill=T,
                      sep=sep.type, dec=".")[1:20,] ##loading the first 20 rows of data, with no header
 
-  View(visual[1:15,])
+  myView(visual[1:15,])
 
 
   ###########################################
@@ -115,7 +115,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
 
       if (length(row.num.head)!=0 & row.num.head %in% 1:20){
         colnames(visual)<-gsub(" ", "_", visual[row.num.head,])
-        View(visual[1:15,])
+        myView(visual[1:15,])
 
         repeat{ ##r3
           cat("\n","\n",crayon::bold("Are the column names correct [y]es or [n]o"))
@@ -153,7 +153,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
       colnames(visual)<-gsub(" ", "_", as.character(column.names))
 
       print(gsub(" ", "_", as.character(column.names)))
-      View(visual[1:15,])
+      myView(visual[1:15,])
 
       repeat{ ##r5
         cat("\n","\n",crayon::bold("Are the column names correct [y]es or [n]o"))
@@ -180,7 +180,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
   if (header.fun==F & length(row.num.head)!=0){ colnames(visual)<-gsub(" ", "_", visual[row.num.head,]) }
   else if (header.fun==F & length(row.num.head)==0){ colnames(visual)<-gsub(" ", "_", as.character(column.names))}
 
-  View(visual[1:15,])
+  myView(visual[1:15,])
 
 
   ###########################################
@@ -259,7 +259,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
   if (!is.na("erase.row")){  visual<-visual[-c(1:as.numeric(erase.row)),]} ##removing the rows that should be removed
   if (!is.na("erase.col")){ visual<-visual[,-c(as.numeric(erase.col))]} ##removing the columns that should be removed
 
-  View(visual[1:15,])
+  myView(visual[1:15,])
 
   cat("\n")
   cat("\n","\n","Here is your dataframe, in the format you had indicated above.
