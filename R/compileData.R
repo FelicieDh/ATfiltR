@@ -644,7 +644,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
   }
 
   #data.compiled<-detects
-  assign(data.compiled, detects)
+  assign("data.compiled", detects)
 
   if (save==TRUE){
     cat("Saving the compiled file...", " \n")
