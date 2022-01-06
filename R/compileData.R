@@ -224,7 +224,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
       } else if (check=="y"){ ## if the user does want to remove columns
 
         repeat{ ##r8
-          cat("\n","\n","Which ones should be erased?")
+          cat("\n","\n",crayon::bold("Which ones should be erased?"))
           cat("\n","(Enter the column numbers one by one, and press [enter][enter] when you are done)")
 
           erase.col<-scan("",what="numeric",nmax=n.col,fill=T, quiet=T)
@@ -639,11 +639,12 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
     cat("Removing duplicates from the compiled data...", " \n")
     if (nrow(duplicates)>0){
       detects<-detects[!duplicated(detects[,c("Transmitter","Receiver","Date.and.Time")]),]
-      return(duplicates)}
+      assign(duplicates, duplicates)
+      }
   }
 
-  data.compiled<-detects
-  return(data.compiled)
+  #data.compiled<-detects
+  assign(data.compiled, detects)
 
   if (save==TRUE){
     cat("Saving the compiled file...", " \n")
