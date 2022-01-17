@@ -80,9 +80,14 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
   ########## Visualizing the data ##############
   ##############################################
 
+  cat("\n","\n",crayon::bold$yellow("ATfiltR compileData(): compiling your telemetry data into one useable file for ATfiltR."))
+  cat("\n")
   cat("\n","\n",crayon::bold$underline$blue("Step 1: Before compiling, we need to check the format you data is in..."))
   cat("\n")
   cat("\n","This is an interactive process, we are going to need you to answer a few questions.")
+  cat("\n")
+  cat("\n","We suggest answers between brackets. So [y] means that you need to press on the y key of your keyboard.")
+  cat("\n","To validate answers, just press [enter]")
   cat("\n")
   cat("\n")
 
@@ -215,8 +220,8 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
 
   repeat{ ##r7
 
-    cat("\n","\n",crayon::bold("Should some of the column.names be removed: [y]es or [n]o"))
-    cat("\n","(Note: This has to be the same for every detection file in the folder)")
+    cat("\n","\n",crayon::bold("Should some of the column be removed: [y]es or [n]o"))
+    #cat("\n","(Note: This has to be the same for every detection file in the folder)")
     check<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
     if (length(check)==1 & check %in% c("y","n")){
@@ -226,6 +231,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
         repeat{ ##r8
           cat("\n","\n",crayon::bold("Which ones should be erased?"))
           cat("\n","(Enter the column numbers one by one, and press [enter][enter] when you are done)")
+          cat("\n","(Note: In RStudio, you can 'mouseover' the columns to see their numbers)")
 
           erase.col<-scan("",what="numeric",nmax=n.col,fill=T, quiet=T)
 
@@ -557,8 +563,8 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
   #################################################
   ########## Iterating through files ##############
   #################################################
-  #length(files)
-  for(j in 1:15){
+
+  for(j in 1:length(files)){
     tryCatch(data.list[[j]]<-read.table(here::here(detection.folder,files[j]),header=header.fun,
                                         fill=TRUE,sep=sep.type,dec=".", colClasses = rep("character", rep=n.col)) ,error = function(e)
                                           cat(crayon::bold$red("\n","File",files[j],"seems to have a problem, we are skipping it...","\n")))
@@ -639,18 +645,18 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
     cat("Removing duplicates from the compiled data...", " \n")
     if (nrow(duplicates)>0){
       detects<-detects[!duplicated(detects[,c("Transmitter","Receiver","Date.and.Time")]),]
-      assign(duplicates, duplicates)
+      duplicates<<-duplicates
       }
   }
 
   #data.compiled<-detects
-  assign("data.compiled", detects)
+  ATfiltR_data.1<<-detects
 
   if (save==TRUE){
     cat("Saving the compiled file...", " \n")
-    write.table(data.compiled, here::here(detection.folder, paste0("ATfiltR_data.compiled_", Sys.Date(),".txt")), sep=",", row.names=F)
-    cat("File saved in your Detections folder under", paste0("ATfiltR_data.compiled_", Sys.Date(),".txt"), " \n")}
-
+    write.table(data.compiled, here::here(detection.folder, paste0("ATfiltR_data.1_", Sys.Date(),".txt")), sep=",", row.names=F)
+    cat("File saved in your Detections folder under", paste0("ATfiltR_data.1_", Sys.Date(),".txt"), " \n")}
+  cat(" \n")
   cat(crayon::bold$yellow("End of process for the data compilation. This took approximately", paste(round(difftime(Sys.time(), start, units="min"))), "minutes!"," \n"))
 
 

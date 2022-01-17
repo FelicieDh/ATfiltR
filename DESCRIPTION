@@ -6,8 +6,9 @@ Author: Félicie Dhellemmes <felicie.dhellemmes@gmail.com>
 Maintainer: Félicie Dhellemmes <felicie.dhellemmes@gmail.com>
 Description: Compiles your detection files, removes duplicates (and saves them elsewhere), 
     attributes animal ID to detections (and save tags that don't belong to you elsewhere),
-    removes detections outside of the deployment period, removes ghost detections via a 
-    "solitary detection" filter (customizable) and a swimming speed filter. 
+    removes detections outside of the deployment period (and saves them elsewhere), 
+    removes ghost detections via a "solitary detection" filter (customizable) 
+    and a swimming speed filter (and saves them elsewhere). 
     Can format the data for use in package RSP.
 License: GPL-3
 Encoding: UTF-8
