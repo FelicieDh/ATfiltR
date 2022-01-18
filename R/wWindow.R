@@ -17,7 +17,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Before running the function, you must be in an R project that contains your detections folder and data folder
+#' # Before running the function, you must be in an R project that contains your detections folder and data folder our data must be compiled via compileData()
 #' wWindow(detection.folder="Detections", data.folder="Data", sep.type=",", save.out.of.deployment=F,
 #' save.unknown.tags=T, discard.first=24, save=T)
 #' }
@@ -88,7 +88,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
       cat("No compiled detections found in your environment or Detections folder... Please compile your detections using compileData() first.", " \n")
       stop("Run compileData() first...")
     } else{
-    cat("Compiled detections found in your environment. Loading the most recent compilation:", paste(files[which.min(difftime(Sys.Date(),as.Date(substr(files, 16, 25))))]), " \n")
+    cat("Compiled detections found in your environment. Loading the most recent compilation:", crayon::cyan(paste(files[which.min(difftime(Sys.Date(),as.Date(substr(files, 16, 25))))]), " \n"))
     ATfiltR_data.1<-read.table(here::here(detection.folder, files[which.min(difftime(Sys.Date(),as.Date(substr(files, 16, 25))))]), sep=",", header=T)
   }
   }
@@ -284,7 +284,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
     if (length(check)==1 & check %in% c("y","n")){
       if (check == "y"){
-        cat("\n",crayon::bold("All good, the deployment data is saved as 'ATfiltR_deployment.csv' in your data folder so we can use it automatically later.", " \n"))
+        cat("\n",crayon::bold("All good, the deployment data is saved as"),crayon::bold$cyan("'ATfiltR_deployment.csv'"), crayon::bold(" in your data folder so we can use it automatically later.", " \n"))
         write.table(deployment, here::here(data.folder, "ATfiltR_deployment.csv"), sep=",", row.names=F)
         break
       } else {
@@ -462,7 +462,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
       if (length(check)==1 & check %in% c("y","n")){
         if (check == "y"){
-          cat("\n",crayon::bold("All good, the spatial data is saved as 'ATfiltR_spatial.csv' in your data folder so we can use it automatically later.", " \n"))
+          cat("\n",crayon::bold("All good, the spatial data is saved as"), crayon::bold$cyan("'ATfiltR_spatial.csv'"), crayon::bold(" in your data folder so we can use it automatically later.", " \n"))
           write.table(spatial, here::here(data.folder, "ATfiltR_spatial.csv"), sep=",", row.names=F)
           break
         } else {
@@ -671,9 +671,9 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
   if (any(!c(unique(as.character(animal[,c(as.numeric(tag.stat))]))) %in% c("Implantation","Active","Inactive"))){
     cat("\n",crayon::bold("The content of the column is not 'Implantation', 'Active' and 'Inactive'"))
     cat("\n","We will show you the contents of your column, for each of them, please indicate if they correspond to",
-                          "\n","[1] Implantation (Data on the day the animal is tagged), each animal you tagged MUST have an implantation!",
-                          "\n","[2] Active (A recapture or resigthing of the animal, released alive and with the transmitter)",
-                          "\n","[3] Inactive (A recapture or resigthing of the animal where the transmitter and/or the animal was removed")
+                          "\n",crayon::bold("[1] Implantation"), "(Data on the day the animal is tagged), each animal you tagged MUST have an implantation!",
+                          "\n",crayon::bold("[2] Active"), "(A recapture or resigthing of the animal, released alive and with the transmitter)",
+                          "\n",crayon::bold("[3] Inactive"), "(A recapture or resigthing of the animal where the transmitter and/or the animal was removed")
 
     if(length(colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])>0){ ##this makes sure there arent any other colummns called Date... It also renames the columns if they are the right ones, but we take care of it later
       colnames(animal)[which(colnames(animal) %in% c("Tag.status"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])
@@ -726,7 +726,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
       if (length(check)==1 & check %in% c("y","n")){
         if (check == "y"){
-          cat("\n",crayon::bold("All good, the animal data is saved as 'ATfiltR_animal.csv' in your data folder so we can use it automatically later.", " \n"))
+          cat("\n",crayon::bold("All good, the animal data is saved as"), crayon::bold$cyan("'ATfiltR_animal.csv'"), crayon::bold("in your data folder so we can use it automatically later.", " \n"))
           write.table(animal, here::here(data.folder, "ATfiltR_animal.csv"), sep=",", row.names=F)
           break
         } else {
@@ -762,12 +762,12 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
   cat("\n")
   cat("\n")
   out.of.deployment<<-ATfiltR_data.1[which(is.na(ATfiltR_data.1$Station.name)),]
-  cat(nrow(out.of.deployment), "detections out of the deployment window... (out of ",nrow(ATfiltR_data.1),")", " \n")
+  cat(crayon::cyan(nrow(out.of.deployment)), "detections out of the deployment window... (out of ",crayon::cyan(nrow(ATfiltR_data.1)),")", " \n")
 
   if (save.out.of.deployment==TRUE){
     cat("Saving the data obtained outside of the deployment window...", " \n")
     write.table(out.of.deployment, here::here(detection.folder, paste0("ATfiltR_out.of.deployment_", Sys.Date(),".txt")), sep=",", row.names=F)
-    cat(crayon::bold("File saved in your Detections folder under", paste0("out.of.deployment_", Sys.Date(),".txt"), " \n"))}
+    cat(crayon::bold("File saved in your Detections folder under"), crayon::bold$cyan(paste0("out.of.deployment_", Sys.Date(),".txt")), " \n")}
 
 
   if (nrow(out.of.deployment)>0){
@@ -884,7 +884,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
   }
   cat("\n")
   cat("\n")
-  cat("Out of", length(unique(animal$ID)), " animals tagged, only", length(unique(ATfiltR_data.1$ID)), "produced data...", " \n")
+  cat("Out of", crayon::cyan(length(unique(animal$ID))), "animals tagged, only", crayon::cyan(length(unique(ATfiltR_data.1$ID))), "produced data...", " \n")
 
 
   if (new.detect==TRUE){
@@ -908,12 +908,12 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
   unknown.tags<<-ATfiltR_data.1[which(is.na(ATfiltR_data.1$ID)),]
   cat("\n")
   cat("\n")
-  cat(nrow(unknown.tags), "detections from unknown tags...", " \n")
+  cat(crayon::cyan(nrow(unknown.tags)), "detections from unknown tags...", " \n")
 
   if (save.unknown.tags==TRUE){
     cat("You indicated 'save.unknown.tags=T'. Saving the data from tags that don't belong to you...", " \n")
     write.table(unknown.tags, here::here(detection.folder, paste0("ATfiltR_unknown.tags_", Sys.Date(),".txt")), sep=",", row.names=F)
-    cat(crayon::bold("File saved in your Detections folder under", paste0("ATfiltR_unknown.tags_", Sys.Date(),".txt"), " \n"))}
+    cat(crayon::bold("File saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_unknown.tags_", Sys.Date(),".txt"), " \n"))}
   cat("\n")
   cat("\n")
   cat("Removing the unknown tags...", " \n")
@@ -929,11 +929,10 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
     cat("\n")
     cat("You indicated 'save=T'. Saving the compiled file after within window filtering...", " \n")
     write.table(ATfiltR_data.2, here::here("Detections", paste0("ATfiltR_data.2_", Sys.Date(),".txt")), sep=",", row.names=F)
-    cat(crayon::bold("File saved in your Detections folder under", paste0("ATfiltR_data.2_", Sys.Date(),".txt"), " \n"))}
+    cat(crayon::bold("File saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_data.2_", Sys.Date(),".txt"), " \n"))}
   cat("\n")
   cat("\n")
   cat(crayon::bold$yellow("End of process for the within window filtering. The filtered detections are in your R environment under ATfiltR_data.2 !"))
-  cat("\n")
-  cat(crayon::bold("This took approximately", paste(round(difftime(Sys.time(), start, units="min"))), "minutes!"," \n"))
+  cat(crayon::bold$yellow("This took approximately", paste(round(difftime(Sys.time(), start, units="min"))), "minutes!"," \n"))
 
  }##end of function

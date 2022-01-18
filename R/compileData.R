@@ -568,7 +568,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
     tryCatch(data.list[[j]]<-read.table(here::here(detection.folder,files[j]),header=header.fun,
                                         fill=TRUE,sep=sep.type,dec=".", colClasses = rep("character", rep=n.col)) ,error = function(e)
                                           cat(crayon::bold$red("\n","File",files[j],"seems to have a problem, we are skipping it...","\n")))
-    cat("We found",length(files), "files in you directory. Compiling:", j, " \r")
+    cat("We found",crayon::cyan(length(files)), "files in you directory. Compiling:", j, " \r")
 
     ##giving the appropriate column names
     if (header.fun==F & length(row.num.head)!=0){ colnames(data.list[[j]])<-gsub(" ", "_", data.list[[j]][row.num.head,]) }
@@ -624,7 +624,22 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
 
 
   cat("\n","Merging all datasets"," \n")
+
+  if (length(data.list)>8){
+    det1<-do.call(rbind, data.list[1:(length(data.list)/4)])
+    det2<-do.call(rbind, data.list[((length(data.list)/4)+1):((length(data.list)/4)*2)])
+    det3<-do.call(rbind, data.list[(((length(data.list)/4)*2)+1):((length(data.list)/4)*3)])
+    det4<-do.call(rbind, data.list[(((length(data.list)/4)*3)+1):length(data.list)])
+    rm(data.list)
+    gc()
+    detects<-rbind(det1,det2,det3,det4)
+    rm(det1, det2, det3, det4)
+    gc()
+  }else{
+
   detects<-do.call(rbind, data.list)
+  rm(data.list)
+  gc()}
 
 
   if (nchar(paste(detects$Date.and.Time[1]))>19) {
@@ -640,7 +655,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
     cat("We found", nrow(duplicates), "duplicates found in your data. (Out of ", nrow(detects),", which is approx.",round(nrow(duplicates)/nrow(detects)*100), "%)", " \n")
     if (save.duplicates==T){
       write.table(duplicates, here::here(detection.folder, paste0("ATfiltR_duplicates_", Sys.Date(),".txt")), sep=sep.type, row.names=F)
-      cat("Duplicates saved in your Detections folder under", paste0("ATfiltR_duplicates_", Sys.Date(),".txt"), " \n")
+      cat(crayon::bold("Duplicates saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_duplicates_", Sys.Date(),".txt"), " \n"))
     }
     cat("Removing duplicates from the compiled data...", " \n")
     if (nrow(duplicates)>0){
@@ -655,8 +670,8 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
   if (save==TRUE){
     cat("Saving the compiled file...", " \n")
     write.table(data.compiled, here::here(detection.folder, paste0("ATfiltR_data.1_", Sys.Date(),".txt")), sep=",", row.names=F)
-    cat("File saved in your Detections folder under", paste0("ATfiltR_data.1_", Sys.Date(),".txt"), " \n")}
-  cat(" \n")
+    cat(crayon::bold("File saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_data.1_", Sys.Date(),".txt"), " \n"))}
+  cat("\n")
   cat(crayon::bold$yellow("End of process for the data compilation. This took approximately", paste(round(difftime(Sys.time(), start, units="min"))), "minutes!"," \n"))
 
 

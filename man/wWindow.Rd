@@ -39,7 +39,7 @@ Finds and filters out the detections that are outside of the deployment window (
 }
 \examples{
 \dontrun{
-# Before running the function, you must be in an R project that contains your detections folder and data folder
+# Before running the function, you must be in an R project that contains your detections folder and data folder our data must be compiled via compileData()
 wWindow(detection.folder="Detections", data.folder="Data", sep.type=",", save.out.of.deployment=F,
 save.unknown.tags=T, discard.first=24, save=T)
 }
