@@ -26,6 +26,7 @@
 #' @importFrom here here
 #' @import crayon
 #' @importFrom lubridate parse_date_time
+#' @importFrom data.table rbindlist
 #'
 #' @importFrom utils View read.table write.table
 #'
@@ -625,21 +626,10 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
 
   cat("\n","Merging all datasets"," \n")
 
-  if (length(data.list)>8){
-    det1<-do.call(rbind, data.list[1:(length(data.list)/4)])
-    det2<-do.call(rbind, data.list[((length(data.list)/4)+1):((length(data.list)/4)*2)])
-    det3<-do.call(rbind, data.list[(((length(data.list)/4)*2)+1):((length(data.list)/4)*3)])
-    det4<-do.call(rbind, data.list[(((length(data.list)/4)*3)+1):length(data.list)])
-    rm(data.list)
-    gc()
-    detects<-rbind(det1,det2,det3,det4)
-    rm(det1, det2, det3, det4)
-    gc()
-  }else{
 
-  detects<-do.call(rbind, data.list)
+  detects<-data.table::rbindlist(data.list)
   rm(data.list)
-  gc()}
+  gc()
 
 
   if (nchar(paste(detects$Date.and.Time[1]))>19) {
