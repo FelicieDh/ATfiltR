@@ -38,7 +38,7 @@
 
 
 compileData<-function(detection.folder="Detections", file.ext=".csv",
-                      sep.type=",", save=TRUE, remove.duplicates=T, save.duplicates=F){
+                      sep.type=",", save=TRUE, remove.duplicates=T, save.duplicates=F, split=T){
 
 
   #####################################################################
@@ -559,77 +559,112 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
   cat("\n")
   cat("\n")
 
-  data.list <- list()
+
 
   #################################################
   ########## Iterating through files ##############
   #################################################
+   temp<-here::here(detection.folder,files)
 
-  for(j in 1:length(files)){
-    tryCatch(data.list[[j]]<-read.table(here::here(detection.folder,files[j]),header=header.fun,
-                                        fill=TRUE,sep=sep.type,dec=".", colClasses = rep("character", rep=n.col)) ,error = function(e)
-                                          cat(crayon::bold$red("\n","File",files[j],"seems to have a problem, we are skipping it...","\n")))
-    cat("We found",crayon::cyan(length(files)), "files in you directory. Compiling:", j, " \r")
-
-    ##giving the appropriate column names
-    if (header.fun==F & length(row.num.head)!=0){ colnames(data.list[[j]])<-gsub(" ", "_", data.list[[j]][row.num.head,]) }
-    else if (header.fun==F & length(row.num.head)==0){ colnames(data.list[[j]])<-gsub(" ", "_", as.character(column.names))}
-
-    if (!is.na("erase.row")){ data.list[[j]]<-data.list[[j]][-c(1:as.numeric(erase.row)),]} ##removing the rows that should be removed
-    if (!is.na("erase.col")){ data.list[[j]]<-data.list[[j]][,-c(as.numeric(erase.col))]} ##removing the columns that should be removed
-
-    ### date and time columns
-
-    if (!is.na(datetime)){ ##date and time are in the same column
-      if(dup.datetime==F){ ##if we don't have to duplicate the column
-        colnames(data.list[[j]])[as.numeric(datetime)]<-"Date.and.Time"
-      } else if(dup.datetime==T){
-        data.list[[j]]$Date.and.Time<-data.list[[j]][,as.numeric(datetime)]
-      }
+  if (split==T){
+    inc<-c(seq.int(from=0, to=length(temp), by=10), length(temp))
+    if(length(inc[duplicated(inc)])>0){
+      inc<-inc[-duplicated(inc)]
     }
+  } else {
+    inc<-0:length(temp)
+  }
 
-    if (!is.na(date) & !is.na(time)){ ##date and time are in the same column
-      data.list[[j]]$Date.and.Time<-paste0(data.list[[j]][,as.numeric(date)]," ",data.list[[j]][,as.numeric(time)])
+  for(i in 1:(length(inc)-1)){
 
+if (split==T){
+  cat("\r","Loading the detections, little by little...", i, "/" , (length(inc)-1))
+}else{
+  cat("\n","Loading the detections...")
+  }
+
+  data.list <- list()
+  data.list = lapply(temp[c((inc[i]+1) : inc[i+1])], read.table,header=header.fun,fill=TRUE,sep=sep.type,dec=".", colClasses = rep("character", rep=n.col))
+
+  if (header.fun==F & length(row.num.head)!=0){ data.list<-lapply(data.list, setNames, gsub(" ", "_", data.list[[1]][row.num.head,]))
+  }else if (header.fun==F & length(row.num.head)==0){ data.list<-lapply(data.list, setNames, gsub(" ", "_", as.character(column.names))) }
+
+  if (!is.na("erase.row")){ data.list<-lapply(data.list, function(x) {x<-x[-c(1:as.numeric(erase.row)),] ;x}) } ##removing the rows that should be removed
+  if (!is.na("erase.col")){ data.list<-lapply(data.list, function(x) {x<-x[,-c(as.numeric(erase.col))] ;x})} ##removing the columns that should be removed
+
+
+  columns<-colnames(data.list[[1]])
+
+
+  if (!is.na(datetime)){ ##date and time are in the same column
+    if(dup.datetime==F){ ##if we don't have to duplicate the column
+      columns[as.numeric(datetime)]<-"Date.and.Time"
+    } else if(dup.datetime==T){
+      data.list<-lapply(data.list, function(x) {x<-cbind(x,Date.and.Time=x[,as.numeric(datetime)]); x})
+      columns[length(columns)]<-"Date.and.Time"
     }
+  }
 
-    ### Transmitter column
+  if (!is.na(date) & !is.na(time)){ ##date and time are in the same column
+    data.list<-lapply(data.list, function(x) {x<-cbind(x,Date.and.Time=paste0(x[,as.numeric(date)]," ",x[,as.numeric(time)])); x})
+    columns[length(columns)]<-"Date.and.Time"
+  }
 
-    if (!is.na(start.t)){
-      data.list[[j]]$Transmitter<-substr(data.list[[j]][,as.numeric(trans)], start.t, stop.t)
-    } else{
-      if(dup.trans==F){
-        colnames(data.list[[j]])[as.numeric(trans)]<-"Transmitter"
-      } else if (dup.trans==T){
-        data.list[[j]]$Transmitter<-data.list[[j]][,as.numeric(trans)]
-      }
+  if (!is.na(start.t)){
+    data.list<-lapply(data.list, function(x) {x[,as.numeric(trans)]<-substr(x[,as.numeric(trans)], start.t, stop.t); x})
+  } else{
+    if(dup.trans==F){
+      columns[as.numeric(trans)]<-"Transmitter"
+    } else if (dup.trans==T){
+      data.list<-lapply(data.list, function(x) {x<-cbind(x,Transmitter=x[,as.numeric(trans)]); x})
+      columns[length(columns)]<-"Transmitter"
     }
+  }
 
-    ### Receiver column
-
-    if (!is.na(start.r)){
-      data.list[[j]]$Receiver<-substr(data.list[[j]][,as.numeric(receiver)], start.r, stop.r)
-    } else{
-      if(dup.receiver==F){
-        colnames(data.list[[j]])[as.numeric(receiver)]<-"Receiver"
-      } else if (dup.trans==T){
-        data.list[[j]]$Receiver<-data.list[[j]][,as.numeric(receiver)]
-      }
+  if (!is.na(start.r)){
+    data.list<-lapply(data.list, function(x) {x[,as.numeric(receiver)]<-substr(x[,as.numeric(receiver)], start.r, stop.r); x})
+  } else{
+    if(dup.receiver==F){
+      columns[as.numeric(receiver)]<-"Receiver"
+    } else if (dup.trans==T){
+      data.list<-lapply(data.list, function(x) {x<-cbind(x,Receiver=x[,as.numeric(receiver)]); x})
+      columns[length(columns)]<-"Receiver"
     }
-
-
-    ##file of origin column
-
-    data.list[[j]]$File<-files[j]
   }
 
 
-  cat("\n","Merging all datasets"," \n")
+  for(j in 1:length(data.list)){
+    data.list[[j]]$File<-files[j]
+  }
+  columns[length(columns)+1]<-"File"
+
+  data.list<-lapply(data.list, setNames, columns)
 
 
-  detects<-data.table::rbindlist(data.list)
+  data.list<-data.table::rbindlist(data.list)
+
+  saveRDS(data.list, file=here::here(detection.folder, paste0("temporary",i,".RDS")))
+
   rm(data.list)
   gc()
+  } ##end of inc
+
+  cat("\n", "\n")
+  tempfiles <- dir(path, pattern = "temporary")
+
+  for (i in 1:length(unique(tempfiles))){
+    sub<-readRDS(here::here(detection.folder, tempfiles[i]))
+  cat("\n","Merging the datasets", i, "/", length(unique(tempfiles)))
+    if (i == 1){
+      detects<-sub
+    } else {
+      detects<-rbind(detects,sub)
+      rm(sub)
+    }
+  }
+  gc()
+
+
 
 
   if (nchar(paste(detects$Date.and.Time[1]))>19) {
@@ -644,8 +679,8 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
     duplicates<-detects[duplicated(detects[,c("Transmitter","Receiver","Date.and.Time")]),]
     cat("We found", nrow(duplicates), "duplicates found in your data. (Out of ", nrow(detects),", which is approx.",round(nrow(duplicates)/nrow(detects)*100), "%)", " \n")
     if (save.duplicates==T){
-      write.table(duplicates, here::here(detection.folder, paste0("ATfiltR_duplicates_", Sys.Date(),".txt")), sep=sep.type, row.names=F)
-      cat(crayon::bold("Duplicates saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_duplicates_", Sys.Date(),".txt"), " \n"))
+      write.table(duplicates, here::here(detection.folder, paste0("ATfiltR_duplicates_", Sys.Date(),".RData")), sep=sep.type, row.names=F)
+      cat(crayon::bold("Duplicates saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_duplicates_", Sys.Date(),".Rdata"), " \n"))
     }
     cat("Removing duplicates from the compiled data...", " \n")
     if (nrow(duplicates)>0){
@@ -654,16 +689,17 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
       }
   }
 
-  #data.compiled<-detects
+
   ATfiltR_data.1<<-detects
 
   if (save==TRUE){
     cat("Saving the compiled file...", " \n")
-    write.table(data.compiled, here::here(detection.folder, paste0("ATfiltR_data.1_", Sys.Date(),".txt")), sep=",", row.names=F)
-    cat(crayon::bold("File saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_data.1_", Sys.Date(),".txt"), " \n"))}
+    write.table(ATfiltR_data.1, here::here(detection.folder, paste0("ATfiltR_data.1_", Sys.Date(),".RData")), sep=",", row.names=F)
+    cat(crayon::bold("File saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_data.1_", Sys.Date(),".RData"), " \n"))}
   cat("\n")
   cat(crayon::bold$yellow("End of process for the data compilation. This took approximately", paste(round(difftime(Sys.time(), start, units="min"))), "minutes!"," \n"))
 
+  file.remove(here::here(detection.folder, tempfiles))
 
 } ##END OF THE FUNCTION
 
