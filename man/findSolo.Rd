@@ -4,7 +4,13 @@
 \alias{findSolo}
 \title{findSolo}
 \usage{
-findSolo(detection.folder = "Detections", save.solo = T, save = T, delay = 1)
+findSolo(
+  detection.folder = "Detections",
+  save.solo = T,
+  save = T,
+  per.receiver = T,
+  delay = 0.5
+)
 }
 \arguments{
 \item{detection.folder}{The name of the folder containing the detection data}
@@ -13,6 +19,9 @@ findSolo(detection.folder = "Detections", save.solo = T, save = T, delay = 1)
 
 \item{save}{Should the data be saved in your detections folder (TRUE or FALSE)
 if FALSE the filtered detections will be in your R environment only}
+
+\item{per.receiver}{If TRUE (default) the solitary detections are considered solitary when they occur alone on a given receiver (Similarly to Kessel et al. 2014). If FALSE they are considered solitary
+when they occur alone across the whole array.}
 
 \item{delay}{(hours) defines solitary detections: detections that are recorded *delay* hours after the previous one and *delay* hours before the subsequent one are considered solitary.}
 }

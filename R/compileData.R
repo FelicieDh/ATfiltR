@@ -12,7 +12,8 @@
 #' same tag, on the same receiver at the same time) be removed (TRUE or FALSE)
 #' @param save.duplicates Should the duplicated detections be saved in your detections folder (TRUE or FALSE)
 #' if FALSE the  duplicated detections will be in your R environment only
-#'
+#' @param split Should the data be processed in chunks (TRUE or FALSE; recommended). Lowers the chances of
+#' errors due to the memory limit being reached when the data are too numerous
 #' @return A data frame object that contains your compiled detections, and another that contains the duplicates
 #'
 #' @examples
@@ -232,7 +233,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
         repeat{ ##r8
           cat("\n","\n",crayon::bold("Which ones should be erased?"))
           cat("\n","(Enter the column numbers one by one, and press [enter][enter] when you are done)")
-          cat("\n","(Note: In RStudio, you can 'mouseover' the columns to see their numbers)")
+          cat("\n","(Tip: In RStudio, you can 'mouseover' the columns to see their numbers)")
 
           erase.col<-scan("",what="numeric",nmax=n.col,fill=T, quiet=T)
 
@@ -578,7 +579,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
   for(i in 1:(length(inc)-1)){
 
 if (split==T){
-  cat("\r","Loading the detections, little by little...", i, "/" , (length(inc)-1))
+  cat("\r","Loading the detections, little by little...", crayon::cyan(i), "/" , (length(inc)-1))
 }else{
   cat("\n","Loading the detections...")
   }
@@ -643,18 +644,18 @@ if (split==T){
 
   data.list<-data.table::rbindlist(data.list)
 
-  saveRDS(data.list, file=here::here(detection.folder, paste0("temporary",i,".RDS")))
+  saveRDS(data.list, file=here::here(detection.folder, paste0("ATfiltR...temporary",i,".RDS")))
 
   rm(data.list)
   gc()
   } ##end of inc
 
   cat("\n", "\n")
-  tempfiles <- dir(path, pattern = "temporary")
+  tempfiles <- dir(path, pattern = "ATfiltR...temporary")
 
   for (i in 1:length(unique(tempfiles))){
     sub<-readRDS(here::here(detection.folder, tempfiles[i]))
-  cat("\n","Merging the datasets", i, "/", length(unique(tempfiles)))
+  cat("\r","Merging the datasets", crayon::cyan(i), "/", length(unique(tempfiles)))
     if (i == 1){
       detects<-sub
     } else {
@@ -664,6 +665,7 @@ if (split==T){
   }
   gc()
 
+  cat("\n", "\n")
 
 
 
@@ -677,9 +679,9 @@ if (split==T){
 
   if (remove.duplicates==T){
     duplicates<-detects[duplicated(detects[,c("Transmitter","Receiver","Date.and.Time")]),]
-    cat("We found", nrow(duplicates), "duplicates found in your data. (Out of ", nrow(detects),", which is approx.",round(nrow(duplicates)/nrow(detects)*100), "%)", " \n")
+    cat("We found", crayon::cyan(nrow(duplicates)), "duplicates found in your data. (Out of ", crayon::cyan(nrow(detects)),", which is approx.",crayon::cyan(round(nrow(duplicates)/nrow(detects)*100)), "%)", " \n")
     if (save.duplicates==T){
-      write.table(duplicates, here::here(detection.folder, paste0("ATfiltR_duplicates_", Sys.Date(),".RData")), sep=sep.type, row.names=F)
+     save(duplicates, file=here::here(detection.folder, paste0("ATfiltR_duplicates_", Sys.Date(),".RData")))
       cat(crayon::bold("Duplicates saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_duplicates_", Sys.Date(),".Rdata"), " \n"))
     }
     cat("Removing duplicates from the compiled data...", " \n")
@@ -694,12 +696,12 @@ if (split==T){
 
   if (save==TRUE){
     cat("Saving the compiled file...", " \n")
-    write.table(ATfiltR_data.1, here::here(detection.folder, paste0("ATfiltR_data.1_", Sys.Date(),".RData")), sep=",", row.names=F)
+    save(ATfiltR_data.1, file=here::here(detection.folder, paste0("ATfiltR_data.1_", Sys.Date(),".RData")))
     cat(crayon::bold("File saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_data.1_", Sys.Date(),".RData"), " \n"))}
   cat("\n")
   cat(crayon::bold$yellow("End of process for the data compilation. This took approximately", paste(round(difftime(Sys.time(), start, units="min"))), "minutes!"," \n"))
 
-  file.remove(here::here(detection.folder, tempfiles))
+  invisible(file.remove(here::here(detection.folder, tempfiles)))
 
 } ##END OF THE FUNCTION
 

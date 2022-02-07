@@ -10,7 +10,8 @@ compileData(
   sep.type = ",",
   save = TRUE,
   remove.duplicates = T,
-  save.duplicates = F
+  save.duplicates = F,
+  split = T
 )
 }
 \arguments{
@@ -28,6 +29,9 @@ same tag, on the same receiver at the same time) be removed (TRUE or FALSE)}
 
 \item{save.duplicates}{Should the duplicated detections be saved in your detections folder (TRUE or FALSE)
 if FALSE the  duplicated detections will be in your R environment only}
+
+\item{split}{Should the data be processed in chunks (TRUE or FALSE; recommended). Lowers the chances of
+errors due to the memory limit being reached when the data are too numerous}
 }
 \value{
 A data frame object that contains your compiled detections, and another that contains the duplicates

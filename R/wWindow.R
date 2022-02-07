@@ -26,12 +26,20 @@
 #' @importFrom here here
 #' @import crayon
 #' @importFrom lubridate parse_date_time
+#' @importFrom data.table as.data.table
 #'
 #' @importFrom utils View read.table write.table
 #'
 #'
 
 
+
+
+################################################################################
+################################################################################
+############################ WITHIN WINDOW #####################################
+################################################################################
+################################################################################
 
 
 ################################################################################
@@ -82,24 +90,23 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
   if(!exists("ATfiltR_data.1")){
     path=here::here(detection.folder)
-    files <- dir(path, pattern ="ATfiltR_data.1")
+    files <- dir(path, pattern ="^ATfiltR_data.1.*\\.RData$")
 
     if (length(files) == 0){
       cat("No compiled detections found in your environment or Detections folder... Please compile your detections using compileData() first.", " \n")
       stop("Run compileData() first...")
     } else{
-    cat("Compiled detections found in your environment. Loading the most recent compilation:", crayon::cyan(paste(files[which.min(difftime(Sys.Date(),as.Date(substr(files, 16, 25))))]), " \n"))
-    ATfiltR_data.1<-read.table(here::here(detection.folder, files[which.min(difftime(Sys.Date(),as.Date(substr(files, 16, 25))))]), sep=",", header=T)
-  }
+      cat("Compiled detections found in your environment. Loading the most recent compilation:", crayon::cyan(paste(files[which.min(difftime(Sys.Date(),as.Date(substr(files, 16, 25))))]), " \n"))
+      load(here::here(detection.folder, files[which.min(difftime(Sys.Date(),as.Date(substr(files, 16, 25))))]))
+
+    }
   }
   cat(" \n")
   cat(crayon::bold("Compiled detections found! Let's do this!", " \n"))
   ##Preparing the datetime as a POSIX and ordering the dataframe
-  cat("Formatting the Date.and.Time column as a POSIXct object and ordering the data chronologically...", " \n")
+  cat("Ordering the data chronologically...", " \n")
 
-  ATfiltR_data.1$Date.and.Time<-as.POSIXct(ATfiltR_data.1$Date.and.Time, format="%Y-%m-%d %H:%M:%S")
   ATfiltR_data.1<-ATfiltR_data.1[order(ATfiltR_data.1$Date.and.Time),]
-  ATfiltR_data.1<<-ATfiltR_data.1
   cat(" \n")
   cat("Let's find your deployment, spatial and animal data...", " \n")
 
@@ -122,141 +129,141 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
   if(length(file.dep)>0){
 
-  cat("\n",crayon::bold("We found an ATfiltR deployment data file, you don't have anything to do, we are loading it..."),"\n")
+    cat("\n",crayon::bold("We found an ATfiltR deployment data file, you don't have anything to do, we are loading it..."),"\n")
 
     deployment<-read.table(here::here(data.folder,file.dep), sep=",", header=T)
 
   } else {
 
-  print(data.frame(Number=1:length(dir(here::here(data.folder), pattern=c(".txt|.csv"))),File=dir(here::here(data.folder), pattern=c(".txt|.csv"))))
+    print(data.frame(Number=1:length(dir(here::here(data.folder), pattern=c(".txt|.csv"))),File=dir(here::here(data.folder), pattern=c(".txt|.csv"))))
 
-  repeat{ ##r1 for deployment data
-  cat("\n",crayon::bold("No ATfiltR deployment file found,
+    repeat{ ##r1 for deployment data
+      cat("\n",crayon::bold("No ATfiltR deployment file found,
                         Please enter the number of the file that contains your deployment data (see choices above)"))
 
-  cat("\n","(Note: If you can't see it, you might be giving us a wrong data.folder,
+      cat("\n","(Note: If you can't see it, you might be giving us a wrong data.folder,
       check that your data.folder is correct and that your deployment data is in .csv or .txt format)")
 
-  depl<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
+      depl<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
 
-  if(!is.na(suppressWarnings(as.numeric(depl))) & suppressWarnings(as.numeric(depl)) %in% 1:length(dir(here::here(data.folder), pattern=c(".txt|.csv")))) { ##check validity of depl
+      if(!is.na(suppressWarnings(as.numeric(depl))) & suppressWarnings(as.numeric(depl)) %in% 1:length(dir(here::here(data.folder), pattern=c(".txt|.csv")))) { ##check validity of depl
 
-   deployment<-read.table(here::here(data.folder,dir(here::here(data.folder), pattern=c(".txt|.csv"))[as.numeric(depl)]), sep=sep.type, header=T)
+        deployment<-read.table(here::here(data.folder,dir(here::here(data.folder), pattern=c(".txt|.csv"))[as.numeric(depl)]), sep=sep.type, header=T)
 
-  cat("\n")
-  print(head(deployment))
-
-
-  repeat{
-    cat("\n",crayon::bold("Is this the right file? [y]es or [n]o"))
-    check<-scan("",what="character",nmax=1,fill=T, quiet=T)
-
-    if (length(check)==1 & check %in% c("y","n")){
-      break
-    }
-  }
-
-   if (check=="y"){break}} ##end of check validity of depl
-  } ##end of r1 bracket
+        cat("\n")
+        print(head(deployment))
 
 
+        repeat{
+          cat("\n",crayon::bold("Is this the right file? [y]es or [n]o"))
+          check<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
-  repeat{ ##r2 ask for start stop
-    cat("\n",crayon::bold("Please enter the column number that contains the date and time for the BEGINNING of the deployment info [column number]"))
-    start.d<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
-
-    cat("\n",crayon::bold("Please enter the column number that contains the date and time for the END of the deployment info [column number]"))
-    stop.d<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
-
-    if ((suppressWarnings(as.numeric(start.d)) %in% 1:as.numeric(ncol(deployment))) & (suppressWarnings(as.numeric(stop.d)) %in% 1:as.numeric(ncol(deployment)))){ ##check validity of start and stop
-
-      print(deployment[1,c(as.numeric(start.d),as.numeric(stop.d))])
-
-
-      repeat{
-        cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
-        check<-scan("",what="character",nmax=1,fill=T, quiet=T)
-
-        if (length(check)==1 & check %in% c("y","n")){
-          break
+          if (length(check)==1 & check %in% c("y","n")){
+            break
+          }
         }
-      }
 
-      if (check=="y"){break}} ##end of check validity of start and stop
-  } ##end of r2 bracket
+        if (check=="y"){break}} ##end of check validity of depl
+    } ##end of r1 bracket
+
+
+
+    repeat{ ##r2 ask for start stop
+      cat("\n",crayon::bold("Please enter the column number that contains the date and time for the BEGINNING of the deployment info [column number]"))
+      start.d<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
+
+      cat("\n",crayon::bold("Please enter the column number that contains the date and time for the END of the deployment info [column number]"))
+      stop.d<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
+
+      if ((suppressWarnings(as.numeric(start.d)) %in% 1:as.numeric(ncol(deployment))) & (suppressWarnings(as.numeric(stop.d)) %in% 1:as.numeric(ncol(deployment)))){ ##check validity of start and stop
+
+        print(deployment[1,c(as.numeric(start.d),as.numeric(stop.d))])
+
+
+        repeat{
+          cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
+          check<-scan("",what="character",nmax=1,fill=T, quiet=T)
+
+          if (length(check)==1 & check %in% c("y","n")){
+            break
+          }
+        }
+
+        if (check=="y"){break}} ##end of check validity of start and stop
+    } ##end of r2 bracket
 
 
     if(length(colnames(deployment)[which(colnames(deployment) %in% c("Start","Stop"))])>0){ ##this makes sure there arent any other colummns called start stop... It also renames the columns if they are the right ones, but we take care of it later
       colnames(deployment)[which(colnames(deployment) %in% c("Start","Stop"))]<-paste0("x.", colnames(deployment)[which(colnames(deployment) %in% c("Start","Stop"))])
     }
 
-  colnames(deployment)[c(as.numeric(start.d),as.numeric(stop.d))]<-c("Start","Stop")
+    colnames(deployment)[c(as.numeric(start.d),as.numeric(stop.d))]<-c("Start","Stop")
 
-  print(head(deployment))
+    print(head(deployment))
 
 
 
-  repeat{ ##r4 to check for receiver ID
-  cat("\n",crayon::bold("Please enter the column number that contains the receiver ID data [column number]"))
-  cat("\n","(Note: This must match the format of the data you indicated in the detections file,
+    repeat{ ##r4 to check for receiver ID
+      cat("\n",crayon::bold("Please enter the column number that contains the receiver ID data [column number]"))
+      cat("\n","(Note: This must match the format of the data you indicated in the detections file,
       See compileData())")
 
-  receiv<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
-  if(suppressWarnings(as.numeric(receiv)) %in% 1:ncol(deployment)){
+      receiv<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
+      if(suppressWarnings(as.numeric(receiv)) %in% 1:ncol(deployment)){
 
-    print(deployment[1,c(as.numeric(receiv))])
+        print(deployment[1,c(as.numeric(receiv))])
 
-    repeat{
-      cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
-      check<-scan("",what="character",nmax=1,fill=T, quiet=T)
+        repeat{
+          cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
+          check<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
-      if (length(check)==1 & check %in% c("y","n")){
-        break
-      }
+          if (length(check)==1 & check %in% c("y","n")){
+            break
+          }
+        }
+
+        if (check=="y"){break}} #end of receiv validity check
+    } ##end of r4 bracket
+
+
+    if(length(colnames(deployment)[which(colnames(deployment) %in% c("Receiver"))])>0){ ##this makes sure there arent any other colummns called Receiver... It also renames the columns if they are the right ones, but we take care of it later
+      colnames(deployment)[which(colnames(deployment) %in% c("Receiver"))]<-paste0("x.", colnames(deployment)[which(colnames(deployment) %in% c("Receiver"))])
     }
 
-    if (check=="y"){break}} #end of receiv validity check
-  } ##end of r4 bracket
-
-
-  if(length(colnames(deployment)[which(colnames(deployment) %in% c("Receiver"))])>0){ ##this makes sure there arent any other colummns called Receiver... It also renames the columns if they are the right ones, but we take care of it later
-    colnames(deployment)[which(colnames(deployment) %in% c("Receiver"))]<-paste0("x.", colnames(deployment)[which(colnames(deployment) %in% c("Receiver"))])
-  }
-
-  colnames(deployment)[c(as.numeric(receiv))]<-"Receiver"
-
-  print(head(deployment))
+    colnames(deployment)[c(as.numeric(receiv))]<-"Receiver"
+    deployment$Receiver<-as.character(deployment$Receiver)
+    print(head(deployment))
 
 
 
 
-  repeat{ ##r6 to check for station name
-    cat("\n",crayon::bold("Please enter the column number that contains the station name data [column number]"))
-    cat("\n","(Note: This must match the format of the station name data in your spatial file)")
+    repeat{ ##r6 to check for station name
+      cat("\n",crayon::bold("Please enter the column number that contains the station name data [column number]"))
+      cat("\n","(Note: This must match the format of the station name data in your spatial file)")
 
-    stat.d<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
-    if(suppressWarnings(as.numeric(receiv)) %in% 1:ncol(deployment)){
+      stat.d<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
+      if(suppressWarnings(as.numeric(receiv)) %in% 1:ncol(deployment)){
 
-      print(deployment[1,c(as.numeric(stat.d))])
+        print(deployment[1,c(as.numeric(stat.d))])
 
-      repeat{
-        cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
-        check<-scan("",what="character",nmax=1,fill=T, quiet=T)
+        repeat{
+          cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
+          check<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
-        if (length(check)==1 & check %in% c("y","n")){
-          break
+          if (length(check)==1 & check %in% c("y","n")){
+            break
+          }
         }
-      }
 
-      if (check=="y"){break}} #end of stat.d valididty check
-  } ##end of r6 bracket
+        if (check=="y"){break}} #end of stat.d valididty check
+    } ##end of r6 bracket
 
-  if(length(colnames(deployment)[which(colnames(deployment) %in% c("Station.name"))])>0){ ##this makes sure there arent any other colummns called Station.name... It also renames the columns if they are the right ones, but we take care of it later
-    colnames(deployment)[which(colnames(deployment) %in% c("Station.name"))]<-paste0("x.", colnames(deployment)[which(colnames(deployment) %in% c("Station.name"))])
-  }
+    if(length(colnames(deployment)[which(colnames(deployment) %in% c("Station.name"))])>0){ ##this makes sure there arent any other colummns called Station.name... It also renames the columns if they are the right ones, but we take care of it later
+      colnames(deployment)[which(colnames(deployment) %in% c("Station.name"))]<-paste0("x.", colnames(deployment)[which(colnames(deployment) %in% c("Station.name"))])
+    }
 
-  colnames(deployment)[c(as.numeric(stat.d))]<-"Station.name"
-
+    colnames(deployment)[c(as.numeric(stat.d))]<-"Station.name"
+    deployment$Station.name<-as.character(deployment$Station.name)
 
   } ##end of ifelse deployment is already made
 
@@ -274,25 +281,25 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
 
   if(length(file.dep)==0){
-  repeat{ ##repeat 6a to save
-    cat(" \n")
-    cat(crayon::yellow("Here is your deployment data, does it look good ? [y]es or [n]o."))
-    cat(" \n","Note: If one or more of your columns had a name that we use in the package we added 'x.' to its name to prevent errors)", " \n")
-    cat(" \n")
+    repeat{ ##repeat 6a to save
+      cat(" \n")
+      cat(crayon::yellow("Here is your deployment data, does it look good ? [y]es or [n]o."))
+      cat(" \n","Note: If one or more of your columns had a name that we use in the package we added 'x.' to its name to prevent errors)", " \n")
+      cat(" \n")
 
-    check<-scan("",what="character",nmax=1,fill=T, quiet=T)
+      check<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
-    if (length(check)==1 & check %in% c("y","n")){
-      if (check == "y"){
-        cat("\n",crayon::bold("All good, the deployment data is saved as"),crayon::bold$cyan("'ATfiltR_deployment.csv'"), crayon::bold(" in your data folder so we can use it automatically later.", " \n"))
-        write.table(deployment, here::here(data.folder, "ATfiltR_deployment.csv"), sep=",", row.names=F)
-        break
-      } else {
-        cat("\n",crayon::bold("Sorry this did not work out! Aborting the process so you can start again!", " \n"))
-        stop("Deployment data creation did not work properly...")
+      if (length(check)==1 & check %in% c("y","n")){
+        if (check == "y"){
+          cat("\n",crayon::bold("All good, the deployment data is saved as"),crayon::bold$cyan("'ATfiltR_deployment.csv'"), crayon::bold(" in your data folder so we can use it automatically later.", " \n"))
+          write.table(deployment, here::here(data.folder, "ATfiltR_deployment.csv"), sep=",", row.names=F)
+          break
+        } else {
+          cat("\n",crayon::bold("Sorry this did not work out! Aborting the process so you can start again!", " \n"))
+          stop("Deployment data creation did not work properly...")
+        }
       }
     }
-  }
   }
 
   deployment<<-deployment
@@ -407,7 +414,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
     }
 
     colnames(spatial)[c(as.numeric(stat.name))]<-"Station.name"
-
+    spatial$Station.name<-as.character(spatial$Station.name)
     print(head(spatial))
 
 
@@ -441,6 +448,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
     }
 
     colnames(spatial)[c(as.numeric(range.cat))]<-"Range.category"
+    spatial$Range.category<-as.character(spatial$Range.category)
 
 
   } ##end of ifelse spatial is already made
@@ -527,131 +535,132 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
 
 
-  repeat{ ##r16 ask for Transmitter
-    cat("\n",crayon::bold("Please enter the column number that contains the Transmitter info [column number]"))
-    cat("(Note: this has to match the transmitter info you indicated in your detection data)")
-    trans<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
+    repeat{ ##r16 ask for Transmitter
+      cat("\n",crayon::bold("Please enter the column number that contains the Transmitter info [column number]"))
+      cat("(Note: this has to match the transmitter info you indicated in your detection data)")
+      trans<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
 
 
-    if ((suppressWarnings(as.numeric(trans)) %in% 1:as.numeric(ncol(animal)))){ ##check validity of  trans
+      if ((suppressWarnings(as.numeric(trans)) %in% 1:as.numeric(ncol(animal)))){ ##check validity of  trans
 
-      print(animal[1,c(as.numeric(trans))])
+        print(animal[1,c(as.numeric(trans))])
 
-      repeat{
-        cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
-        check<-scan("",what="character",nmax=1,fill=T, quiet=T)
+        repeat{
+          cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
+          check<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
-        if (length(check)==1 & check %in% c("y","n")){
-          break
+          if (length(check)==1 & check %in% c("y","n")){
+            break
+          }
         }
-      }
 
-      if (check=="y"){break}} ##end of check validity of trans
-  } ##end of r16 bracket
+        if (check=="y"){break}} ##end of check validity of trans
+    } ##end of r16 bracket
 
-  if(length(colnames(animal)[which(colnames(animal) %in% c("Transmitter"))])>0){ ##this makes sure there arent any other colummns called Transmitter... It also renames the columns if they are the right ones, but we take care of it later
-    colnames(animal)[which(colnames(animal) %in% c("Transmitter"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Transmitter"))])
-  }
+    if(length(colnames(animal)[which(colnames(animal) %in% c("Transmitter"))])>0){ ##this makes sure there arent any other colummns called Transmitter... It also renames the columns if they are the right ones, but we take care of it later
+      colnames(animal)[which(colnames(animal) %in% c("Transmitter"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Transmitter"))])
+    }
 
-  colnames(animal)[c(as.numeric(trans))]<-"Transmitter"
-
-  print(head(animal))
-
+    colnames(animal)[c(as.numeric(trans))]<-"Transmitter"
+    animal$Transmitter<-as.character(animal$Transmitter)
+    print(head(animal))
 
 
 
-  repeat{ ##r18 ask for ID
-    cat("\n",crayon::bold("Please enter the column number that contains the animal ID [column number]"))
-    ID<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
+
+    repeat{ ##r18 ask for ID
+      cat("\n",crayon::bold("Please enter the column number that contains the animal ID [column number]"))
+      ID<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
 
 
-    if ((suppressWarnings(as.numeric(ID)) %in% 1:as.numeric(ncol(animal)))){ ##check validity of ID
+      if ((suppressWarnings(as.numeric(ID)) %in% 1:as.numeric(ncol(animal)))){ ##check validity of ID
 
-      print(animal[1,c(as.numeric(ID))])
+        print(animal[1,c(as.numeric(ID))])
 
-      repeat{
-        cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
-        check<-scan("",what="character",nmax=1,fill=T, quiet=T)
+        repeat{
+          cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
+          check<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
-        if (length(check)==1 & check %in% c("y","n")){
-          break
+          if (length(check)==1 & check %in% c("y","n")){
+            break
+          }
         }
-      }
 
-      if (check=="y"){break}} ##end of check validity of ID
-  } ##end of r18 bracket
+        if (check=="y"){break}} ##end of check validity of ID
+    } ##end of r18 bracket
 
-  if(length(colnames(animal)[which(colnames(animal) %in% c("ID"))])>0){ ##this makes sure there arent any other colummns called ID... It also renames the columns if they are the right ones, but we take care of it later
-    colnames(animal)[which(colnames(animal) %in% c("ID"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("ID"))])
-  }
+    if(length(colnames(animal)[which(colnames(animal) %in% c("ID"))])>0){ ##this makes sure there arent any other colummns called ID... It also renames the columns if they are the right ones, but we take care of it later
+      colnames(animal)[which(colnames(animal) %in% c("ID"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("ID"))])
+    }
 
-  colnames(animal)[c(as.numeric(ID))]<-"ID"
+    colnames(animal)[c(as.numeric(ID))]<-"ID"
+    animal$ID<-as.character(animal$ID)
 
-  print(head(animal))
+    print(head(animal))
 
 
 
-  repeat{ ##r20 ask for anim.date
-    cat("\n",crayon::bold("Please enter the column number that contains the Date info [column number]"))
-    cat("\n","(Note: It can be in a simple date format or a date and time format, both will work)")
-    anim.date<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
+    repeat{ ##r20 ask for anim.date
+      cat("\n",crayon::bold("Please enter the column number that contains the Date info [column number]"))
+      cat("\n","(Note: It can be in a simple date format or a date and time format, both will work)")
+      anim.date<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
 
-    if ((suppressWarnings(as.numeric(anim.date)) %in% 1:as.numeric(ncol(animal)))){ ##check validity of  anim.date
+      if ((suppressWarnings(as.numeric(anim.date)) %in% 1:as.numeric(ncol(animal)))){ ##check validity of  anim.date
 
-      print(animal[1,c(as.numeric(anim.date))])
+        print(animal[1,c(as.numeric(anim.date))])
 
-      repeat{
-        cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
-        check<-scan("",what="character",nmax=1,fill=T, quiet=T)
+        repeat{
+          cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
+          check<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
-        if (length(check)==1 & check %in% c("y","n")){
-          break
+          if (length(check)==1 & check %in% c("y","n")){
+            break
+          }
         }
-      }
 
-      if (check=="y"){break}} ##end of check validity of anim.date
-  } ##end of r20 bracket
+        if (check=="y"){break}} ##end of check validity of anim.date
+    } ##end of r20 bracket
 
 
-  if(length(colnames(animal)[which(colnames(animal) %in% c("Date"))])>0){ ##this makes sure there arent any other colummns called Date... It also renames the columns if they are the right ones, but we take care of it later
-    colnames(animal)[which(colnames(animal) %in% c("Date"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Date"))])
-  }
+    if(length(colnames(animal)[which(colnames(animal) %in% c("Date"))])>0){ ##this makes sure there arent any other colummns called Date... It also renames the columns if they are the right ones, but we take care of it later
+      colnames(animal)[which(colnames(animal) %in% c("Date"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Date"))])
+    }
 
-  colnames(animal)[c(as.numeric(anim.date))]<-"Date"
+    colnames(animal)[c(as.numeric(anim.date))]<-"Date"
 
-  print(head(animal))
-
+    print(head(animal))
 
 
 
-  repeat{ ##r22 ask for tag status
-    cat("\n",crayon::bold("Is there a column with the tag status ? If yes, enter the column number [column number], else enter [n]o"))
-    cat("\n","\n","(Reminder: the tag status column allows us to distinguish the implantation of the tag
+
+    repeat{ ##r22 ask for tag status
+      cat("\n",crayon::bold("Is there a column with the tag status ? If yes, enter the column number [column number], else enter [n]o"))
+      cat("\n","\n","(Reminder: the tag status column allows us to distinguish the implantation of the tag
         and the subsequent recaptures of the animal. If you don't have a tag status column, we will
         consider that every row in you animal data frame is an implantation row (i.e., contains
         data on the animal on the day of tagging))")
-    cat("\n","\n","(Note: the tag status column has three possible entries. 'Implantation' for when the
+      cat("\n","\n","(Note: the tag status column has three possible entries. 'Implantation' for when the
         animal is tagged. 'Active' for when the animal is resighted or recaptured and released alive with the transmitter.
         'Inactive' for when the animal is resighted or recaptured and the transmitter and/or the animal removed.
         If your dataset is a little different we will help you change it to fit the package...)")
 
 
-    tag.stat<-scan("",what="character",nmax=1,fill=T, quiet=T)
+      tag.stat<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
 
-    if (length(check)==1 & tag.stat=="n"){
-      cat("\n",crayon::bold("No tag status column. Creating one, with every row being 'Implantation'."))
+      if (length(check)==1 & tag.stat=="n"){
+        cat("\n",crayon::bold("No tag status column. Creating one, with every row being 'Implantation'."))
 
-      if(length(colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])>0){ ##this makes sure there arent any other colummns called Date... It also renames the columns if they are the right ones, but we take care of it later
-        colnames(animal)[which(colnames(animal) %in% c("Tag.status"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])
-      }
+        if(length(colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])>0){ ##this makes sure there arent any other colummns called Date... It also renames the columns if they are the right ones, but we take care of it later
+          colnames(animal)[which(colnames(animal) %in% c("Tag.status"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])
+        }
         animal$Tag.status<-"Implantation"
         tag.stat<-as.numeric(ncol(animal))
 
         break ##break r22
       } else if (length(check)==1 & suppressWarnings(as.numeric(tag.stat)) %in% 1:as.numeric(ncol(animal))){
 
-      print(animal[1,c(as.numeric(tag.stat))])
+        print(animal[1,c(as.numeric(tag.stat))])
 
 
         repeat{
@@ -665,43 +674,43 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
         if (check=="y"){break}} #end of validity check
 
-  } ##end of r22 bracket
+    } ##end of r22 bracket
 
 
-  if (any(!c(unique(as.character(animal[,c(as.numeric(tag.stat))]))) %in% c("Implantation","Active","Inactive"))){
-    cat("\n",crayon::bold("The content of the column is not 'Implantation', 'Active' and 'Inactive'"))
-    cat("\n","We will show you the contents of your column, for each of them, please indicate if they correspond to",
-                          "\n",crayon::bold("[1] Implantation"), "(Data on the day the animal is tagged), each animal you tagged MUST have an implantation!",
-                          "\n",crayon::bold("[2] Active"), "(A recapture or resigthing of the animal, released alive and with the transmitter)",
-                          "\n",crayon::bold("[3] Inactive"), "(A recapture or resigthing of the animal where the transmitter and/or the animal was removed")
+    if (any(!c(unique(as.character(animal[,c(as.numeric(tag.stat))]))) %in% c("Implantation","Active","Inactive"))){
+      cat("\n",crayon::bold("The content of the column is not 'Implantation', 'Active' and 'Inactive'"))
+      cat("\n","We will show you the contents of your column, for each of them, please indicate if they correspond to",
+          "\n",crayon::bold("[1] Implantation"), "(Data on the day the animal is tagged), each animal you tagged MUST have an implantation!",
+          "\n",crayon::bold("[2] Active"), "(A recapture or resigthing of the animal, released alive and with the transmitter)",
+          "\n",crayon::bold("[3] Inactive"), "(A recapture or resigthing of the animal where the transmitter and/or the animal was removed")
 
-    if(length(colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])>0){ ##this makes sure there arent any other colummns called Date... It also renames the columns if they are the right ones, but we take care of it later
-      colnames(animal)[which(colnames(animal) %in% c("Tag.status"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])
+      if(length(colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])>0){ ##this makes sure there arent any other colummns called Date... It also renames the columns if they are the right ones, but we take care of it later
+        colnames(animal)[which(colnames(animal) %in% c("Tag.status"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])
 
-    for (i in 1:length(unique(animal[,c(as.numeric(tag.stat))]))){
-      repeat{
-     cat("\n",crayon::bold$yellow(unique(animal[,c(as.numeric(tag.stat))])[i]))
+        for (i in 1:length(unique(animal[,c(as.numeric(tag.stat))]))){
+          repeat{
+            cat("\n",crayon::bold$yellow(unique(animal[,c(as.numeric(tag.stat))])[i]))
 
-      cat("\n",crayon::bold("[1] Implantation, [2] Active or [3] Inactive ?"))
+            cat("\n",crayon::bold("[1] Implantation, [2] Active or [3] Inactive ?"))
 
-      iter.tag<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
+            iter.tag<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
 
-      if (length(iter.tag)==1 & suppressWarnings(as.numeric(iter.tag)) %in% c(1,2,3)){
-        animal[which(animal[,c(as.numeric(tag.stat))] == unique(animal[,c(as.numeric(tag.stat))])[i]), "Tag.status"] <- c("Implantation","Active","Inactive")[as.numeric(iter.tag)]
-        break
+            if (length(iter.tag)==1 & suppressWarnings(as.numeric(iter.tag)) %in% c(1,2,3)){
+              animal[which(animal[,c(as.numeric(tag.stat))] == unique(animal[,c(as.numeric(tag.stat))])[i]), "Tag.status"] <- c("Implantation","Active","Inactive")[as.numeric(iter.tag)]
+              break
+            }
+          }
+        }
       }
+    } else {
+
+      if(length(colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])>0){ ##this makes sure there arent any other colummns called Date... It also renames the columns if they are the right ones, but we take care of it later
+        colnames(animal)[which(colnames(animal) %in% c("Tag.status"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])
       }
-      }
-  }
-  } else {
 
-  if(length(colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])>0){ ##this makes sure there arent any other colummns called Date... It also renames the columns if they are the right ones, but we take care of it later
-    colnames(animal)[which(colnames(animal) %in% c("Tag.status"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])
-  }
+      colnames(animal)[c(as.numeric(tag.stat))]<-"Tag.status"
 
-  colnames(animal)[c(as.numeric(tag.stat))]<-"Tag.status"
-
-  }
+    }
 
   }  ##end of ifelse animal is already made
 
@@ -752,12 +761,15 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
 
   for (i in 1:nrow(deployment)){
-    ATfiltR_data.1[which(ATfiltR_data.1$Receiver == deployment[i,"Receiver"] &
-                          ATfiltR_data.1$Date.and.Time > deployment[i,"Start"] &
-                          ATfiltR_data.1$Date.and.Time < deployment[i,"Stop"]),
-                  c("Station.name", "Latitude", "Longitude")] <-
-      c( deployment[i,"Station.name"], spatial[which(spatial$Station.name==deployment[i,"Station.name"]), c("Latitude", "Longitude")])
-    cat(crayon::bold("Checking deployment window and attributing spatial coordinates:", i, "/",nrow(deployment), " \r"))
+
+    ATfiltR_data.1[Receiver == deployment[i,"Receiver"] &
+                     Date.and.Time > deployment[i,"Start"] &
+                     Date.and.Time < deployment[i,"Stop"],`:=` (Station.name = deployment[i,"Station.name"],
+                                                                Latitude = spatial[which(spatial$Station.name==deployment[i,"Station.name"]), c("Latitude")],
+                                                                Longitude = spatial[which(spatial$Station.name==deployment[i,"Station.name"]), c("Longitude")])]
+
+
+    cat(crayon::bold("Checking deployment window and attributing spatial coordinates:"), crayon::bold$cyan(i), crayon::bold("/",nrow(deployment), " \r"))
   }
   cat("\n")
   cat("\n")
@@ -766,7 +778,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
   if (save.out.of.deployment==TRUE){
     cat("Saving the data obtained outside of the deployment window...", " \n")
-    write.table(out.of.deployment, here::here(detection.folder, paste0("ATfiltR_out.of.deployment_", Sys.Date(),".txt")), sep=",", row.names=F)
+    save(out.of.deployment, here::here(detection.folder, paste0("ATfiltR_out.of.deployment_", Sys.Date(),".Rdata")))
     cat(crayon::bold("File saved in your Detections folder under"), crayon::bold$cyan(paste0("out.of.deployment_", Sys.Date(),".txt")), " \n")}
 
 
@@ -794,30 +806,30 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
     We strongly recommend to tranfer any length data you will want to use for speed based filtering later)")
     cat("\n")
     cat("\n")
-   print(data.frame(Column.number=which(!colnames(animal) %in% c("ID","Transmitter","Longitude","Latitude","Date")),
+    print(data.frame(Column.number=which(!colnames(animal) %in% c("ID","Transmitter","Longitude","Latitude","Date")),
                      Column.name=colnames(animal)[which(!colnames(animal) %in% c("ID","Transmitter","Longitude","Latitude","Date"))]))
 
-   to.transfer<-scan("",what="numeric",nmax=ncol(animal),fill=T, quiet=T)
+    to.transfer<-scan("",what="numeric",nmax=ncol(animal),fill=T, quiet=T)
 
-   if (length(to.transfer) == 0){break}
+    if (length(to.transfer) == 0){break}
 
-   if (all(suppressWarnings(as.numeric(to.transfer)) %in% which(!colnames(animal) %in% c("ID","Transmitter","Longitude","Latitude","Date")))){
+    if (all(suppressWarnings(as.numeric(to.transfer)) %in% which(!colnames(animal) %in% c("ID","Transmitter","Longitude","Latitude","Date")))){
 
-     cat(colnames(animal)[as.numeric(to.transfer)])
+      cat(colnames(animal)[as.numeric(to.transfer)])
 
-     repeat{
-       cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
-       check<-scan("",what="character",nmax=1,fill=T, quiet=T)
+      repeat{
+        cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
+        check<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
-       if (length(check)==1 & check %in% c("y","n")){
-         break
-       }
-     }
+        if (length(check)==1 & check %in% c("y","n")){
+          break
+        }
+      }
 
-     if (check=="y"){
-       to.transfer<-as.numeric(to.transfer)
-       break}
-   }
+      if (check=="y"){
+        to.transfer<-as.numeric(to.transfer)
+        break}
+    }
   }
 
 
@@ -837,50 +849,43 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
   if (check=="y"){
     new.detect<-TRUE
-   } else {new.detect<-FALSE }
-  #
+  } else {new.detect<-FALSE }
 
-
-    ATfiltR_data.1$ID<-NA
-
-    if (length(to.transfer) > 0){
-     ATfiltR_data.1[,colnames(animal)[to.transfer]]<-NA
-     }
 
 
   for (i in 1:nrow(animal)){
     if (animal[i,"Tag.status"]=="Implantation"){
-      ATfiltR_data.1[which(ATfiltR_data.1$Transmitter == animal[i,"Transmitter"] &
-                            ATfiltR_data.1$Date.and.Time >= animal[i,"Date"]+discard.first*3600),"ID"] <- animal[i,"ID"]
+      ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
+                       Date.and.Time >= animal[i,"Date"]+24*3600,ID := animal[i,"ID"]]
 
       if (length(to.transfer) > 0){
-        ATfiltR_data.1[which(ATfiltR_data.1$Transmitter == animal[i,"Transmitter"] &
-                              ATfiltR_data.1$Date.and.Time >= animal[i,"Date"]+discard.first*3600),colnames(animal)[to.transfer]]<-animal[i,to.transfer]
+        ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
+                         Date.and.Time >= animal[i,"Date"]+24*3600, colnames(animal)[to.transfer] := animal[i,to.transfer]]
       }
 
     }
     else if (animal[i,"Tag.status"]=="Active"){
-      ATfiltR_data.1[which(ATfiltR_data.1$Transmitter == animal[i,"Transmitter"] &
-                            ATfiltR_data.1$Date.and.Time >= animal[i,"Date"]), "ID"] <- animal[i,"ID"]
+      ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
+                       Date.and.Time >= animal[i,"Date"],ID := animal[i,"ID"]]
 
       if (length(to.transfer) > 0){
-        ATfiltR_data.1[which(ATfiltR_data.1$Transmitter == animal[i,"Transmitter"] &
-                              ATfiltR_data.1$Date.and.Time >= animal[i,"Date"]),colnames(animal)[to.transfer]]<-animal[i,to.transfer]}
+        ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
+                         Date.and.Time >= animal[i,"Date"], colnames(animal)[to.transfer] := animal[i,to.transfer]]}
 
     } else if (animal[i,"Tag.status"]=="Inactive"){
-      ATfiltR_data.1[which(ATfiltR_data.1$Transmitter == animal[i,"Transmitter"] &
-                            ATfiltR_data.1$Date.and.Time == animal[i,"Date"]),"ID"] <- animal[i,"ID"]
-      ATfiltR_data.1[which(ATfiltR_data.1$Transmitter == animal[i,"Transmitter"] &
-                            ATfiltR_data.1$Date.and.Time > animal[i,"Date"]),"ID"] <- NA
+      ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
+                       Date.and.Time == animal[i,"Date"],ID := animal[i,"ID"]]
+      ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
+                       Date.and.Time > animal[i,"Date"],ID := NA]
 
       if (length(to.transfer) > 0){
-        ATfiltR_data.1[which(ATfiltR_data.1$Transmitter == animal[i,"Transmitter"] &
-                              ATfiltR_data.1$Date.and.Time == animal[i,"Date"]),colnames(animal)[to.transfer]]<-animal[i,c(7:ncol(animal))]
-        ATfiltR_data.1[which(ATfiltR_data.1$Transmitter == animal[i,"Transmitter"] &
-                              ATfiltR_data.1$Date.and.Time > animal[i,"Date"]),colnames(animal)[to.transfer]]<-NA }
+        ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
+                         Date.and.Time == animal[i,"Date"], colnames(animal)[to.transfer] := animal[i,to.transfer]]
+        ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
+                         Date.and.Time == animal[i,"Date"], colnames(animal)[to.transfer] := NA]}
 
     }
-    cat(crayon::bold("Attributing tagged animals to their respective detections:", i, "/", nrow(animal), " \r"))
+    cat(crayon::bold("Attributing tagged animals to their respective detections:"), crayon::bold$cyan(i), crayon::bold("/", nrow(animal), " \r"))
   }
   cat("\n")
   cat("\n")
@@ -888,19 +893,20 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
 
   if (new.detect==TRUE){
-  cat("\n")
-  cat("\n")
-  cat(crayon::bold("Adding the animal data as data.points in your detections."))
-  adding<-animal
-  colnames(adding)[which(colnames(adding)=="Date")]<-"Date.and.Time"
-  colnames(adding)[which(colnames(adding)=="Tag.status")]<-"Station.name"
-  adding<-adding[,which(colnames(adding) %in% colnames(ATfiltR_data.1))]
-  adding[,colnames(ATfiltR_data.1)[-which(colnames(ATfiltR_data.1) %in% colnames(adding))]]<-NA
-  adding<-adding[,colnames(ATfiltR_data.1)]
+    cat("\n")
+    cat("\n")
+    cat(crayon::bold("Adding the animal data as data.points in your detections."))
+    adding<-animal
+    colnames(adding)[which(colnames(adding)=="Date")]<-"Date.and.Time"
+    colnames(adding)[which(colnames(adding)=="Tag.status")]<-"Station.name"
+    adding<-adding[,which(colnames(adding) %in% colnames(ATfiltR_data.1))]
+    adding[,colnames(ATfiltR_data.1)[-which(colnames(ATfiltR_data.1) %in% colnames(adding))]]<-NA
+    adding<-adding[,colnames(ATfiltR_data.1)]
+    adding<-data.table::as.data.table(adding)
 
-  ATfiltR_data.1<-rbind(adding,ATfiltR_data.1)
+    ATfiltR_data.1<-rbind(adding,ATfiltR_data.1)
 
-  ATfiltR_data.1<-ATfiltR_data.1[order(ATfiltR_data.1$Date.and.Time),]
+    ATfiltR_data.1<-ATfiltR_data.1[order(ATfiltR_data.1$Date.and.Time),]
   }
 
 
@@ -912,15 +918,15 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
   if (save.unknown.tags==TRUE){
     cat("You indicated 'save.unknown.tags=T'. Saving the data from tags that don't belong to you...", " \n")
-    write.table(unknown.tags, here::here(detection.folder, paste0("ATfiltR_unknown.tags_", Sys.Date(),".txt")), sep=",", row.names=F)
-    cat(crayon::bold("File saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_unknown.tags_", Sys.Date(),".txt"), " \n"))}
+    save(unknown.tags, file=here::here(detection.folder, paste0("ATfiltR_unknown.tags_", Sys.Date(),".RData")))
+    cat(crayon::bold("File saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_unknown.tags_", Sys.Date(),".RData"), " \n"))}
   cat("\n")
   cat("\n")
   cat("Removing the unknown tags...", " \n")
 
   if (nrow(unknown.tags)>0){
     ATfiltR_data.1<-ATfiltR_data.1[-which(is.na(ATfiltR_data.1$ID)),]}
-     ATfiltR_data.1$within.window<-"Yes"
+  ATfiltR_data.1$within.window<-"Yes"
 
   ATfiltR_data.2<<-ATfiltR_data.1
 
@@ -928,11 +934,11 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
     cat("\n")
     cat("\n")
     cat("You indicated 'save=T'. Saving the compiled file after within window filtering...", " \n")
-    write.table(ATfiltR_data.2, here::here("Detections", paste0("ATfiltR_data.2_", Sys.Date(),".txt")), sep=",", row.names=F)
-    cat(crayon::bold("File saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_data.2_", Sys.Date(),".txt"), " \n"))}
+    save(ATfiltR_data.2, file=here::here("Detections", paste0("ATfiltR_data.2_", Sys.Date(),".RData")))
+    cat(crayon::bold("File saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_data.2_", Sys.Date(),".RData"), " \n"))}
   cat("\n")
   cat("\n")
   cat(crayon::bold$yellow("End of process for the within window filtering. The filtered detections are in your R environment under ATfiltR_data.2 !"))
   cat(crayon::bold$yellow("This took approximately", paste(round(difftime(Sys.time(), start, units="min"))), "minutes!"," \n"))
 
- }##end of function
+}##end of function
