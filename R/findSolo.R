@@ -24,7 +24,7 @@
 #'
 #' @importFrom here here
 #' @import crayon
-#' @import data.table
+#' @importFrom data.table shift
 #'
 #' @importFrom utils View read.table write.table
 #'

@@ -42,13 +42,6 @@
 ################################################################################
 
 
-################################################################################
-################################################################################
-############################ WITHIN WINDOW #####################################
-################################################################################
-################################################################################
-
-
 wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",", save.out.of.deployment=F,
                   save.unknown.tags=T, discard.first=24, save=T){
 
@@ -424,7 +417,14 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
       range.cat<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
-      if (length(range.cat)==1 & (range.cat=="n")){ break
+      if (length(range.cat)==1 & (range.cat=="n")){
+
+        if(length(colnames(spatial)[which(colnames(spatial) %in% c("Range.category"))])>0){ ##this makes sure there arent any other colummns called Range.category... It also renames the columns if they are the right ones, but we take care of it later
+          colnames(spatial)[which(colnames(spatial) %in% c("Range.category"))]<-paste0("x.", colnames(spatial)[which(colnames(spatial) %in% c("Range.category"))])
+        }
+        spatial$Range.category<-"All"
+        break
+
       } else if (length(range.cat)==1 & suppressWarnings(as.numeric(range.cat)) %in% 1:ncol(spatial)){
 
         print(spatial[1,c(as.numeric(range.cat))])
@@ -766,7 +766,8 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
                      Date.and.Time > deployment[i,"Start"] &
                      Date.and.Time < deployment[i,"Stop"],`:=` (Station.name = deployment[i,"Station.name"],
                                                                 Latitude = spatial[which(spatial$Station.name==deployment[i,"Station.name"]), c("Latitude")],
-                                                                Longitude = spatial[which(spatial$Station.name==deployment[i,"Station.name"]), c("Longitude")])]
+                                                                Longitude = spatial[which(spatial$Station.name==deployment[i,"Station.name"]), c("Longitude")],
+                                                                Range.category = spatial[which(spatial$Station.name == deployment[i,"Station.name"]), "Range.category"])]
 
 
     cat(crayon::bold("Checking deployment window and attributing spatial coordinates:"), crayon::bold$cyan(i), crayon::bold("/",nrow(deployment), " \r"))
@@ -911,7 +912,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
 
 
-  unknown.tags<<-ATfiltR_data.1[which(is.na(ATfiltR_data.1$ID)),]
+  unknown.tags<<-ATfiltR_data.1[is.na(ATfiltR_data.1$ID),]
   cat("\n")
   cat("\n")
   cat(crayon::cyan(nrow(unknown.tags)), "detections from unknown tags...", " \n")
