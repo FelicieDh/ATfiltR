@@ -779,7 +779,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
   if (save.out.of.deployment==TRUE){
     cat("Saving the data obtained outside of the deployment window...", " \n")
-    save(out.of.deployment, here::here(detection.folder, paste0("ATfiltR_out.of.deployment_", Sys.Date(),".Rdata")))
+    save(out.of.deployment, file=here::here(detection.folder, paste0("ATfiltR_out.of.deployment_", Sys.Date(),".Rdata")))
     cat(crayon::bold("File saved in your Detections folder under"), crayon::bold$cyan(paste0("out.of.deployment_", Sys.Date(),".txt")), " \n")}
 
 
@@ -897,7 +897,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
     cat("\n")
     cat("\n")
     cat(crayon::bold("Adding the animal data as data.points in your detections."))
-    adding<-animal
+    adding<-animal[which(animal$ID %in% unique(ATfiltR_data.1$ID)),]
     colnames(adding)[which(colnames(adding)=="Date")]<-"Date.and.Time"
     colnames(adding)[which(colnames(adding)=="Tag.status")]<-"Station.name"
     adding<-adding[,which(colnames(adding) %in% colnames(ATfiltR_data.1))]

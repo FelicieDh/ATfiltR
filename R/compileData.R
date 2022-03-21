@@ -135,9 +135,9 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
         if (check2=="y"){
 
           if (row.num.head==1){
-            header.fun=T; break ##end of r2, in a case when the row number is 1
+            header.fun<-TRUE; break ##end of r2, in a case when the row number is 1
           } else {
-            header.fun=F; break } ##end of r2, in a case when the row number is not 1
+            header.fun<-FALSE; break } ##end of r2, in a case when the row number is not 1
         } ##end of if check2==y
       } ##end of first if statement
     } ##end of r2 bracket
@@ -149,7 +149,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
 
       cat("\n","\n","Please type your desired column names.")
       cat("\n","(Note: We suggest that you stay away from special characters...")
-      header.fun=F
+      header.fun<-FALSE
       column.names<-rep(NA,ncol(visual))
 
       for (i in 1:ncol(visual)){
@@ -201,7 +201,9 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
 
     if (length(check)==1 & check %in% c("y","n")){
 
-      if(check=="n") {break ## end of r6 if the user does not want to remove any rows
+      if(check=="n") {
+        erase.row<-NA
+        break ## end of r6 if the user does not want to remove any rows
       } else if (check=="y"){ ##if the user does want to remove rows
         repeat{ ##r7
           cat("\n","\n","How many rows should be erased? (e.g. input [5] will erase the first 5 rows)")
@@ -227,7 +229,9 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
     check<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
     if (length(check)==1 & check %in% c("y","n")){
-      if(check=="n") {break ## end of r7 if the user does not want to remove any columns
+      if(check=="n") {
+        erase.col<-NA
+        break ## end of r7 if the user does not want to remove any columns
       } else if (check=="y"){ ## if the user does want to remove columns
 
         repeat{ ##r8
@@ -258,14 +262,19 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
   cat("\n","\n",crayon::bold$underline$blue("Step 2: Now, we need to know the content of a few of your column names..."))
   cat("\n")
 
+  if(!is.na(erase.row)){
   visual<-read.table(here::here(detection.folder,files[1]),header=header.fun,fill=T,
                      sep=sep.type, dec=".", colClasses = rep("character", rep=n.col))[1:(erase.row+20),]
+  } else{
+  visual<-read.table(here::here(detection.folder,files[1]),header=header.fun,fill=T,
+                       sep=sep.type, dec=".", colClasses = rep("character", rep=n.col))[1:20,]
+  }
 
   if (header.fun==F & length(row.num.head)!=0){ colnames(visual)<-gsub(" ", "_", visual[row.num.head,])
   } else if (header.fun==F & length(row.num.head)==0){colnames(visual)<-gsub(" ", "_", as.character(column.names))}
 
-  if (!is.na("erase.row")){  visual<-visual[-c(1:as.numeric(erase.row)),]} ##removing the rows that should be removed
-  if (!is.na("erase.col")){ visual<-visual[,-c(as.numeric(erase.col))]} ##removing the columns that should be removed
+  if (!is.na(erase.row)){  visual<-visual[-c(1:as.numeric(erase.row)),]} ##removing the rows that should be removed
+  if (any(!is.na(erase.col))){ visual<-visual[,-c(as.numeric(erase.col))]} ##removing the columns that should be removed
 
   myView(visual[1:15,])
 
@@ -433,8 +442,9 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
                     cat("\n","(e.g. if the current transmitter info is '1234portkey5678', and you want to keep 'portkey', enter [11] as the eleventh character is the last that you wish to keep)")
                     stop.t<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
 
-                    if ((as.numeric(start.t) %in% 1:nchar(visu.trans)) & (as.numeric(stop.t) %in% 1:nchar(visu.trans)) & (start.t < stop.t)){
-                      visu.trans<-substr(visu.trans, start.t, stop.t)
+                    if ((as.numeric(start.t) %in% 1:nchar(visu.trans)) & (as.numeric(stop.t) %in% 1:nchar(visu.trans)) & (as.numeric(start.t) < as.numeric(stop.t))){
+                      visu.trans<-substr(visu.trans, as.numeric(start.t), as.numeric(stop.t))
+                      dup.trans<-F
                       break
 
                     }
@@ -525,8 +535,9 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
                     cat("\n","(e.g. if the current receiver info is '1234nargles5678', and you want to keep 'nargles', enter [11] as the eleventh character is the last that you wish to keep)")
                     stop.r<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
 
-                    if ((as.numeric(start.r) %in% 1:nchar(visu.receiver)) & (as.numeric(stop.r) %in% 1:nchar(visu.receiver)) & (start.r < stop.r)){
-                      visu.receiver<-substr(visu.receiver, start.r, stop.r)
+                    if ((as.numeric(start.r) %in% 1:nchar(visu.receiver)) & (as.numeric(stop.r) %in% 1:nchar(visu.receiver)) & (as.numeric(start.r) < as.numeric(stop.r))){
+                      visu.receiver<-substr(visu.receiver, as.numeric(start.r), as.numeric(stop.r))
+                      dup.receiver<-F
                       break
 
                     }
@@ -590,8 +601,8 @@ if (split==T){
   if (header.fun==F & length(row.num.head)!=0){ data.list<-lapply(data.list, setNames, gsub(" ", "_", data.list[[1]][row.num.head,]))
   }else if (header.fun==F & length(row.num.head)==0){ data.list<-lapply(data.list, setNames, gsub(" ", "_", as.character(column.names))) }
 
-  if (!is.na("erase.row")){ data.list<-lapply(data.list, function(x) {x<-x[-c(1:as.numeric(erase.row)),] ;x}) } ##removing the rows that should be removed
-  if (!is.na("erase.col")){ data.list<-lapply(data.list, function(x) {x<-x[,-c(as.numeric(erase.col))] ;x})} ##removing the columns that should be removed
+  if (!is.na(erase.row)){ data.list<-lapply(data.list, function(x) {x<-x[-c(1:as.numeric(erase.row)),] ;x}) } ##removing the rows that should be removed
+  if (any(!is.na(erase.col))){ data.list<-lapply(data.list, function(x) {x<-x[,-c(as.numeric(erase.col))] ;x})} ##removing the columns that should be removed
 
 
   columns<-colnames(data.list[[1]])
@@ -612,7 +623,8 @@ if (split==T){
   }
 
   if (!is.na(start.t)){
-    data.list<-lapply(data.list, function(x) {x[,as.numeric(trans)]<-substr(x[,as.numeric(trans)], start.t, stop.t); x})
+    data.list<-lapply(data.list, function(x) {x[,as.numeric(trans)]<-substr(x[,as.numeric(trans)], as.numeric(start.t), as.numeric(stop.t)); x})
+    columns[as.numeric(trans)]<-"Transmitter"
   } else{
     if(dup.trans==F){
       columns[as.numeric(trans)]<-"Transmitter"
@@ -623,7 +635,8 @@ if (split==T){
   }
 
   if (!is.na(start.r)){
-    data.list<-lapply(data.list, function(x) {x[,as.numeric(receiver)]<-substr(x[,as.numeric(receiver)], start.r, stop.r); x})
+    data.list<-lapply(data.list, function(x) {x[,as.numeric(receiver)]<-substr(x[,as.numeric(receiver)], as.numeric(start.r), as.numeric(stop.r)); x})
+    columns[as.numeric(receiver)]<-"Receiver"
   } else{
     if(dup.receiver==F){
       columns[as.numeric(receiver)]<-"Receiver"
@@ -676,9 +689,36 @@ if (split==T){
   detects$Date.and.Time<-as.POSIXct(detects$Date.and.Time, format="%Y-%m-%d %H:%M:%S")
 
 
+  if (remove.duplicates==T){
+  repeat{ ##clock-drift
+    cat("\n","\n",crayon::bold("Is the 'Date.and.Time' column you indicated corrected for clock drift? [y]es or [n]o"))
+
+    check2<-scan("",what="character",nmax=1,fill=T, quiet=T)
+
+    if (length(check2)==1 & (check2=="y" | check2=="n")) {break}} ##end of clockdrift
+
+  if (check2=="y"){
+    cat("\n","There is a chance that duplicated detections got corrected differently and their times slightly differ.
+        In this case they will not be found during our duplication check...")
+
+    repeat{
+
+      cat("\n","Would you like us to use an uncorrected date and time object instead? if yes, indicate the [column number], otherwise indicate [n]o.")
+      View(detects[1:5,])
+      no.cor<-scan("",what="character",nmax=1,fill=T, quiet=T)
+
+      if (length(no.cor)==1 & (no.cor=="n" | as.numeric(no.cor) %in% ncol(detects))) {break}
+    }
+  }
+}
 
   if (remove.duplicates==T){
-    duplicates<-detects[duplicated(detects[,c("Transmitter","Receiver","Date.and.Time")]),]
+
+    if(!is.na(no.cor) & (no.cor!="n" | as.numeric(no.cor) %in% ncol(detects))){
+     duplicates<-detects[duplicated(detects[,c("Transmitter","Receiver",no.cor)]),]
+    } else {
+    duplicates<-detects[duplicated(detects[,c("Transmitter","Receiver","Date.and.Time")]),]}
+
     cat("We found", crayon::cyan(nrow(duplicates)), "duplicates found in your data. (Out of ", crayon::cyan(nrow(detects)),", which is approx.",crayon::cyan(round(nrow(duplicates)/nrow(detects)*100)), "%)", " \n")
     if (save.duplicates==T){
      save(duplicates, file=here::here(detection.folder, paste0("ATfiltR_duplicates_", Sys.Date(),".RData")))

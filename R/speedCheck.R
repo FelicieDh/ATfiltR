@@ -39,7 +39,7 @@
 ############################################################################
 ############################################################################
 
-speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver.range=NA, base=3600, factor=NA, exponent=NA, max.distance=NA, save.speedy=TRUE, save=TRUE){
+speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver.range=NA, base=1000, factor=NA, exponent=NA, max.distance=NA, save.speedy=TRUE, save=TRUE){
 
   cat("\n","\n",crayon::bold$yellow("ATfiltR speedCheck(): filtering detections that happen at an unreasonable speed."))
   cat("\n")
@@ -419,8 +419,9 @@ speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver
     print(ATfiltR_data.3[1,eval(factor), with=FALSE])
 
     repeat{
-      cat("Please indicate by how much this needs to be multiplied for your results to be in meters per hours", "\n")
-      cat("Note: if the formula gives a result in m/h, indicate [1], if it is in cm/h, indicate [0.01], if it is in mm/h, indicate [0.001], etc.",  "\n")
+      cat("Please indicate by how much this needs to be multiplied for your results to be in meters", "\n")
+      cat("Note: if the size you indicated is in m, indicate [1], if it is in cm, indicate [0.01], if it is in mm, indicate [0.001], etc.",  "\n")
+      cat("Note 2: In some instances, formulas in papers take the body size in mm, to calculate speed in m/h, in this case, you should leave your bodysize in mm...",  "\n")
 
       convert<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
 
@@ -454,11 +455,12 @@ speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver
     }
   }
 
+
   if (!is.na(factor)){
     repeat {
       cat(crayon::bold("Speed calculated: Please make sure these results seem to make sense", "\n"))
 
-      cat("For a fish of bodylength", crayon::cyan(paste(ATfiltR_data.3[1,BL.calc])), " the speed in meters per hour was calculated at:", crayon::cyan(ATfiltR_data.3[1,Swim.speed]), "\n", "\n")
+      cat("For a fish of bodylength", crayon::cyan(paste(ATfiltR_data.3[1,BL.calc])), " the speed in meters per hour was calculated at:", crayon::cyan(ATfiltR_data.3[1,Swim.speed]*3600), "\n", "\n")
 
       cat("Is this reasonable? [y]es or [n]o")
 
@@ -479,6 +481,7 @@ speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver
   these.animals<-unique(ATfiltR_data.3$ID)
   reduced.dist<-dist.long
   reduced.range<-range
+  ATfiltR_data.3[,Swim.speed :=(ATfiltR_data.3[,Swim.speed]*3600)]
   ATfiltR_speedy.data<-data.table::data.table(a=NA, b=NA)
   t<-0
 
