@@ -712,7 +712,44 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
     }
 
+
+    repeat{ ##r18 ask for Locatiom
+      cat("\n",crayon::bold("Is there a column corresponding to the identity of the location (correponding to the locations in the distance matrix for speed calculations), if yes, enter the [column number], otherwise enter [n]o"))
+      loc<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
+
+      if (length(loc)==1 & loc=="no"){break}
+
+      if (length(loc)==1 & (suppressWarnings(as.numeric(ID)) %in% 1:as.numeric(ncol(animal)))){ ##check validity of ID
+
+        print(animal[1,c(as.numeric(loc))])
+
+        repeat{
+          cat("\n",crayon::bold("Is this right? [y]es or [n]o"))
+          check<-scan("",what="character",nmax=1,fill=T, quiet=T)
+
+          if (length(check)==1 & check %in% c("y","n")){
+            break
+          }
+        }
+
+        if (check=="y"){break}} ##end of check validity of ID
+    } ##end of r18 bracket
+
+    if(length(colnames(animal)[which(colnames(animal) %in% c("Location"))])>0){ ##this makes sure there arent any other colummns called ID... It also renames the columns if they are the right ones, but we take care of it later
+      colnames(animal)[which(colnames(animal) %in% c("Location"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Location"))])
+    }
+
+    if (loc=="no"){
+      animal$Location<-"ATfiltR_animal"
+    } else {
+    colnames(animal)[c(as.numeric(loc))]<-"Location"}
+    animal$loc<-as.character(animal$loc)
+
+    print(head(animal))
+
   }  ##end of ifelse animal is already made
+
+
 
   animal$Date<-lubridate::parse_date_time(animal$Date, c("Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS"), truncated = 3)
 
@@ -807,14 +844,14 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
     We strongly recommend to tranfer any length data you will want to use for speed based filtering later)")
     cat("\n")
     cat("\n")
-    print(data.frame(Column.number=which(!colnames(animal) %in% c("ID","Transmitter","Longitude","Latitude","Date")),
-                     Column.name=colnames(animal)[which(!colnames(animal) %in% c("ID","Transmitter","Longitude","Latitude","Date"))]))
+    print(data.frame(Column.number=which(!colnames(animal) %in% c("ID","Transmitter","Longitude","Latitude","Date","Location")),
+                     Column.name=colnames(animal)[which(!colnames(animal) %in% c("ID","Transmitter","Longitude","Latitude","Date","Location"))]))
 
     to.transfer<-scan("",what="numeric",nmax=ncol(animal),fill=T, quiet=T)
 
     if (length(to.transfer) == 0){break}
 
-    if (all(suppressWarnings(as.numeric(to.transfer)) %in% which(!colnames(animal) %in% c("ID","Transmitter","Longitude","Latitude","Date")))){
+    if (all(suppressWarnings(as.numeric(to.transfer)) %in% which(!colnames(animal) %in% c("ID","Transmitter","Longitude","Latitude","Date","Location")))){
 
       cat(colnames(animal)[as.numeric(to.transfer)])
 
@@ -838,8 +875,8 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
     cat("\n")
     cat("\n",crayon::bold("Should the animal data become data points in your detections? [y]es or [n]o"))
     cat("\n","Every row in the animal data will be used to create detections.
-        The newly created detections will inherit the 'Date', 'Longitude', 'Latitude', 'Transmitter', 'ID' and all other data you chose to transfer,
-        but the 'Station.name' will be the 'Tag.status' (Implantation, Active or Inactive)")
+        The newly created detections will inherit the 'Date', 'Longitude', 'Latitude', 'Transmitter', 'ID', and all other data you chose to transfer,
+        but the 'Station.name' will be the 'Location'")
 
     check<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
@@ -899,7 +936,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
     cat(crayon::bold("Adding the animal data as data.points in your detections."))
     adding<-animal[which(animal$ID %in% unique(ATfiltR_data.1$ID)),]
     colnames(adding)[which(colnames(adding)=="Date")]<-"Date.and.Time"
-    colnames(adding)[which(colnames(adding)=="Tag.status")]<-"Station.name"
+    colnames(adding)[which(colnames(adding)=="Location")]<-"Station.name"
     adding<-adding[,which(colnames(adding) %in% colnames(ATfiltR_data.1))]
     adding[,colnames(ATfiltR_data.1)[-which(colnames(ATfiltR_data.1) %in% colnames(adding))]]<-NA
     adding<-adding[,colnames(ATfiltR_data.1)]

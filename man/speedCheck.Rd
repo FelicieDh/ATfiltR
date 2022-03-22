@@ -8,7 +8,7 @@ speedCheck(
   detection.folder = "Detections",
   data.folder = "Data",
   receiver.range = NA,
-  base = 3600,
+  base = 1000,
   factor = NA,
   exponent = NA,
   max.distance = NA,

@@ -76,6 +76,7 @@ compileData<-function(detection.folder="Detections", file.ext=".csv",
   start.r<-NA ##characters to keep in the receiver string
   stop.r<-NA ##characters to keep in the receiver string
   okdate<-FALSE ##checking wether the time object is good
+  no.cor<-NA ##Columns for non corrected time
 
 
   ##############################################
@@ -704,19 +705,20 @@ if (split==T){
     repeat{
 
       cat("\n","Would you like us to use an uncorrected date and time object instead? if yes, indicate the [column number], otherwise indicate [n]o.")
-      View(detects[1:5,])
+      myView(detects[1:5,])
       no.cor<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
-      if (length(no.cor)==1 & (no.cor=="n" | as.numeric(no.cor) %in% ncol(detects))) {break}
+      if (length(no.cor)==1 & (no.cor=="n" | as.numeric(no.cor) %in% 1:ncol(detects))) {break}
     }
   }
 }
 
   if (remove.duplicates==T){
 
-    if(!is.na(no.cor) & (no.cor!="n" | as.numeric(no.cor) %in% ncol(detects))){
-     duplicates<-detects[duplicated(detects[,c("Transmitter","Receiver",no.cor)]),]
-    } else {
+    if(!is.na(no.cor) & (no.cor!="n" & as.numeric(no.cor) %in% 1:ncol(detects))){
+      colnames(detects)[as.numeric(no.cor)]<-"Date.and.Time.nocor"
+    duplicates<-detects[duplicated(detects[,c("Transmitter","Receiver","Date.and.Time.nocor")]),]
+    } else if (is.na(no.cor) | no.cor=="n") {
     duplicates<-detects[duplicated(detects[,c("Transmitter","Receiver","Date.and.Time")]),]}
 
     cat("We found", crayon::cyan(nrow(duplicates)), "duplicates found in your data. (Out of ", crayon::cyan(nrow(detects)),", which is approx.",crayon::cyan(round(nrow(duplicates)/nrow(detects)*100)), "%)", " \n")
@@ -726,7 +728,10 @@ if (split==T){
     }
     cat("Removing duplicates from the compiled data...", " \n")
     if (nrow(duplicates)>0){
-      detects<-detects[!duplicated(detects[,c("Transmitter","Receiver","Date.and.Time")]),]
+      if (!is.na(no.cor) & (no.cor!="n" & as.numeric(no.cor) %in% 1:ncol(detects))){
+        detects<-detects[!duplicated(detects[,c("Transmitter","Receiver","Date.and.Time.nocor")]),]
+      }else if (is.na(no.cor) | no.cor=="n"){
+      detects<-detects[!duplicated(detects[,c("Transmitter","Receiver","Date.and.Time")]),]}
       duplicates<<-duplicates
       }
   }
