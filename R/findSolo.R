@@ -158,6 +158,7 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
     ATfiltR_data.2[Lag.after.pR > delay & Lag.before.pR > delay, Solo := "Yes"] ## When the previous and next detections are before and after our delay, the detection is considered a solo
     ATfiltR_data.2[is.na(Lag.after.pR) & Lag.before.pR > delay, Solo := "Yes"]##same for the first and last row of each individual
     ATfiltR_data.2[is.na(Lag.before.pR) & Lag.after.pR > delay, Solo := "Yes"]##same for the first and last row of each individual
+    ATfiltR_data.2[is.na(Lag.before.pR) & is.na(Lag.after.pR), Solo := "Yes"]##same if these is no lag on the same receivers
   } else {
 
     ATfiltR_data.2[, Solo := "No"]

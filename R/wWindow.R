@@ -743,7 +743,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
       animal$Location<-"ATfiltR_animal"
     } else {
     colnames(animal)[c(as.numeric(loc))]<-"Location"}
-    animal$loc<-as.character(animal$loc)
+    animal$Location<-as.character(animal$Location)
 
     print(head(animal))
 
@@ -822,7 +822,8 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
   if (nrow(out.of.deployment)>0){
     cat(crayon::bold("Removing the data obtained outside of the deployment window...", " \n"))
-    ATfiltR_data.1<-ATfiltR_data.1[-which(is.na(ATfiltR_data.1$Station.name)),]}
+    #ATfiltR_data.1<-ATfiltR_data.1[-which(is.na(ATfiltR_data.1$Station.name)),]
+    ATfiltR_data.1<-na.omit(ATfiltR_data.1, cols="Station.name")}
 
 
 
@@ -949,7 +950,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
 
 
-  unknown.tags<<-ATfiltR_data.1[is.na(ATfiltR_data.1$ID),]
+  unknown.tags<<-ATfiltR_data.1[!Transmitter %in% unique(animal$Transmitter),]
   cat("\n")
   cat("\n")
   cat(crayon::cyan(nrow(unknown.tags)), "detections from unknown tags...", " \n")
@@ -963,7 +964,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
   cat("Removing the unknown tags...", " \n")
 
   if (nrow(unknown.tags)>0){
-    ATfiltR_data.1<-ATfiltR_data.1[-which(is.na(ATfiltR_data.1$ID)),]}
+    ATfiltR_data.1<-ATfiltR_data.1[Transmitter %in% unique(animal$Transmitter),]}
   ATfiltR_data.1$within.window<-"Yes"
 
   ATfiltR_data.2<<-ATfiltR_data.1
@@ -972,7 +973,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
     cat("\n")
     cat("\n")
     cat("You indicated 'save=T'. Saving the compiled file after within window filtering...", " \n")
-    save(ATfiltR_data.2, file=here::here("Detections", paste0("ATfiltR_data.2_", Sys.Date(),".RData")))
+    save(ATfiltR_data.2, file=here::here(detection.folder, paste0("ATfiltR_data.2_", Sys.Date(),".RData")))
     cat(crayon::bold("File saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_data.2_", Sys.Date(),".RData"), " \n"))}
   cat("\n")
   cat("\n")

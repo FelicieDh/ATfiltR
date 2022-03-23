@@ -142,7 +142,6 @@ speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver
             break
           }
         }
-
         if (check=="y"){break}} ##end of check validity of depl
     } ##end of r1 bracket
 
@@ -496,6 +495,9 @@ speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver
   }
 
   cat("\n")
+
+  ATfiltR_data.3[, Range.here := 500]
+  ATfiltR_data.3[, Range.previous := 500]
 
   repeat{
 
