@@ -638,7 +638,7 @@ speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver
             ATfiltR_speedy.data<-rbind(ATfiltR_speedy.data, ATfiltR_data.3[Distance.full>=eval(max.distance),])
           }
 
-          ATfiltR_data.3<-ATfiltR_data.3[Distance.full<eval(max.distance),]
+          ATfiltR_data.3<-ATfiltR_data.3[Distance.full<eval(max.distance) | is.na(Distance.full),]
           cat("Removal of these detections.", " \n")}
       }
 

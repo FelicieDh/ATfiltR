@@ -975,6 +975,8 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
     cat("You indicated 'save=T'. Saving the compiled file after within window filtering...", " \n")
     save(ATfiltR_data.2, file=here::here(detection.folder, paste0("ATfiltR_data.2_", Sys.Date(),".RData")))
     cat(crayon::bold("File saved in your Detections folder under"), crayon::cyan$bold(paste0("ATfiltR_data.2_", Sys.Date(),".RData"), " \n"))}
+
+
   cat("\n")
   cat("\n")
   cat(crayon::bold$yellow("End of process for the within window filtering. The filtered detections are in your R environment under ATfiltR_data.2 !"))

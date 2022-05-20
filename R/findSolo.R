@@ -216,7 +216,7 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
     if (save==TRUE){
       cat("\n")
       cat("There weren't any solitary detections: Saving the compiled file without removing any detections...", " \n")
-      write.table(ATfiltR_data.3, here::here(detection.folder, paste0("ATfiltR_data.3_", Sys.Date(),".txt")), sep=",", row.names=F)
+      save(ATfiltR_data.3, file=here::here(detection.folder, paste0("ATfiltR_data.3_", Sys.Date(),".RData")))
       cat(crayon::bold("File saved in your detections folder under"), crayon::bold$cyan(paste0("ATfiltR_data.3_", Sys.Date(),".txt")), crayon::bold(" \n"))}
   }
   cat("\n")
