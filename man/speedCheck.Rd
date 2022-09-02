@@ -44,7 +44,11 @@ Filters out detections that occur faster than the animal's speed (user provided)
 }
 \examples{
 \dontrun{
-# Before running the function, you must be in an R project that contains your detections folder and data folder your data must be compiled via compileData(), and filteres within withinWindow() and findSolo()
-speedCheck(detection.folder="Detections", data.folder="Data", receiver.range=NA, base=3600, factor=NA, exponent=NA, max.distance=NA, save.speedy=TRUE, save=TRUE)
+# Before running the function, you must be in an R project that contains
+your detections folder and data folder your data must be compiled via
+compileData(), and filteres within withinWindow() and findSolo()
+speedCheck(detection.folder="Detections", data.folder="Data",
+receiver.range=NA, base=3600, factor=NA, exponent=NA, max.distance=NA,
+save.speedy=TRUE, save=TRUE)
 }
 }

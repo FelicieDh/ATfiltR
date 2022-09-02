@@ -18,8 +18,12 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Before running the function, you must be in an R project that contains your detections folder and data folder your data must be compiled via compileData(), and filteres within withinWindow() and findSolo()
-#' speedCheck(detection.folder="Detections", data.folder="Data", receiver.range=NA, base=3600, factor=NA, exponent=NA, max.distance=NA, save.speedy=TRUE, save=TRUE)
+#' # Before running the function, you must be in an R project that contains
+#' your detections folder and data folder your data must be compiled via
+#' compileData(), and filteres within withinWindow() and findSolo()
+#' speedCheck(detection.folder="Detections", data.folder="Data",
+#' receiver.range=NA, base=3600, factor=NA, exponent=NA, max.distance=NA,
+#' save.speedy=TRUE, save=TRUE)
 #' }
 #' @export
 #'
@@ -28,7 +32,7 @@
 #' @importFrom lubridate parse_date_time
 #' @importFrom data.table as.data.table
 #'
-#' @importFrom utils View read.table write.table
+#' @importFrom utils View read.table write.table head
 #'
 #'
 
@@ -400,7 +404,7 @@ speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver
       if (check=="y"){
 
         distances[lower.tri(distances, diag = TRUE)]<-NA
-        dist.long<-reshape2::melt(distances)
+        dist.long<-data.table::melt(distances)
         dist.long<-dist.long[-which(is.na(dist.long[,3])),]
 
         break}} ##end of check validity of depl

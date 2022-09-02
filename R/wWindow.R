@@ -17,8 +17,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Before running the function, you must be in an R project that contains your detections folder and data folder our data must be compiled via compileData()
-#' wWindow(detection.folder="Detections", data.folder="Data", sep.type=",", save.out.of.deployment=F,
+#' # Before running the function, you must be in an R project that contains
+#' your detections folder and data folder our data must be compiled via
+#' compileData()
+#' wWindow(detection.folder="Detections", data.folder="Data", sep.type=",",
+#' save.out.of.deployment=F,
 #' save.unknown.tags=T, discard.first=24, save=T)
 #' }
 #' @export
@@ -28,7 +31,8 @@
 #' @importFrom lubridate parse_date_time
 #' @importFrom data.table as.data.table
 #'
-#' @importFrom utils View read.table write.table
+#' @importFrom utils View read.table write.table head
+#' @importFrom stats na.omit
 #'
 #'
 

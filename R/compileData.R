@@ -18,7 +18,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Before running the function, you must be in an R project that contains your detections folder
+#' # Before running the function, you must be in an R project
+#' that contains your detections folder
 #' function(detection.folder="Detections", file.ext=".csv",
 #' sep.type=",", save=TRUE, remove.duplicates=T, save.duplicates=F)
 #' }
@@ -28,8 +29,9 @@
 #' @import crayon
 #' @importFrom lubridate parse_date_time
 #' @importFrom data.table rbindlist
+#' @importFrom stats setNames
 #'
-#' @importFrom utils View read.table write.table
+#' @importFrom utils View read.table write.table head
 #'
 #'
 
@@ -740,6 +742,7 @@ if (split==T){
 
 
   ATfiltR_data.1<<-detects
+
 
   if (save==TRUE){
     cat("Saving the compiled file...", " \n")

@@ -41,7 +41,8 @@ Compiles the acoustic telemetry data in a folder into a file that is useable by 
 }
 \examples{
 \dontrun{
-# Before running the function, you must be in an R project that contains your detections folder
+# Before running the function, you must be in an R project
+that contains your detections folder
 function(detection.folder="Detections", file.ext=".csv",
 sep.type=",", save=TRUE, remove.duplicates=T, save.duplicates=F)
 }

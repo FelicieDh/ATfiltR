@@ -17,7 +17,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Before running the function, you must be in an R project that contains your detections folder and data folder, your data must be compiled via compileData(), and could (should) have already been filtered by wWindow()
+#' # Before running the function, you must be in an R project that contains
+#' your detections folder and data folder, your data must be compiled via
+#' compileData(), and could (should) have already been filtered by wWindow()
 #' findSolo(detection.folder="Detections", save.solo=T, save=T, delay = 1)
 #' }
 #' @export
@@ -26,7 +28,7 @@
 #' @import crayon
 #' @importFrom data.table shift
 #'
-#' @importFrom utils View read.table write.table
+#' @importFrom utils View read.table write.table head
 #'
 #'
 #'
@@ -55,6 +57,7 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
   ##############################################
   ########## Defining the objects ##############
   ##############################################
+
 
   these.animals<-NA ##all the tags that you have in the detections data
   Solo.number<-NA ##number of rows with Solo detections

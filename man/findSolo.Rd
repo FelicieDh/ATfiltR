@@ -33,7 +33,9 @@ Finds and filters out the detections that are alone within a defined time window
 }
 \examples{
 \dontrun{
-# Before running the function, you must be in an R project that contains your detections folder and data folder, your data must be compiled via compileData(), and could (should) have already been filtered by wWindow()
+# Before running the function, you must be in an R project that contains
+your detections folder and data folder, your data must be compiled via
+compileData(), and could (should) have already been filtered by wWindow()
 findSolo(detection.folder="Detections", save.solo=T, save=T, delay = 1)
 }
 }
