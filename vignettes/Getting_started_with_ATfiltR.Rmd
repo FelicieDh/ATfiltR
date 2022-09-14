@@ -1,9 +1,13 @@
 ---
 title: "Getting started with ATfiltR"
-Author: "Félicie Dhellemmes"
-output: rmarkdown::html_vignette
+author: "Félicie Dhellemmes"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
 vignette: >
-  %\VignetteIndexEntry{Getting started with ATfiltR}
+  %\VignetteIndexEntry{1. Getting Started}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
