@@ -43,18 +43,6 @@ You can install the development version of ATfiltR from
 ``` r
 #install.packages("remotes") ##If remotes is not already installed
 remotes::install_github("FelicieDh/ATfiltR", build_opts = c("--no-resave-data", "--no-manual"), build_vignettes = TRUE) 
-#> 
-#>          checking for file 'C:\Users\dhellemmes\AppData\Local\Temp\RtmpC2yuWT\remotes22d05b6550ce\FelicieDh-ATfiltR-cdeecf4/DESCRIPTION' ...  ✔  checking for file 'C:\Users\dhellemmes\AppData\Local\Temp\RtmpC2yuWT\remotes22d05b6550ce\FelicieDh-ATfiltR-cdeecf4/DESCRIPTION'
-#>       ─  preparing 'ATfiltR':
-#>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
-#>       ─  installing the package to build vignettes
-#>          creating vignettes ...     creating vignettes ...   ✔  creating vignettes (4.3s)
-#>       ─  checking for LF line-endings in source and make files and shell scripts
-#>       ─  checking for empty or unneeded directories
-#>      Omitted 'LazyData' from DESCRIPTION
-#>       ─  building 'ATfiltR_0.1.0.tar.gz'
-#>      
-#> 
 ```
 
 ## Using ATfiltR

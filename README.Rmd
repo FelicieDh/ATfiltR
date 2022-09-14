@@ -40,7 +40,7 @@ Finer, fully user interactive filtering (and other cool stuff) is available in t
 
 You can install the development version of ATfiltR from [GitHub](https://github.com/) with:
 
-``` {r, message=F, warning=F, eval=T}
+``` {r, message=F, warning=F, eval=F}
 #install.packages("remotes") ##If remotes is not already installed
 remotes::install_github("FelicieDh/ATfiltR", build_opts = c("--no-resave-data", "--no-manual"), build_vignettes = TRUE) 
 ```
@@ -52,7 +52,7 @@ You will need to get an [RStudio Project](https://support.rstudio.com/hc/en-us/a
 
 We **strongly** recommend that you read the vignettes, they are the package's manual!
 
-```{r, warning=F, message=F}
+```{r, warning=F, message=F, eval=F}
 browseVignettes("ATfiltR")
 ```
 
