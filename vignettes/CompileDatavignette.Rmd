@@ -1,6 +1,6 @@
 ---
 title: "compileData()"
-author: "Félicie Dhellemmes"
+author: "ATfiltR Team"
 date: "`r Sys.Date()`"
 output:
   prettydoc::html_pretty:
@@ -16,65 +16,69 @@ OK, you should have a project openned in R, and your detections should be stored
 
 If that's not the case, [**Go back here**](Getting_started_with_ATFiltR.html)
 
-they are part of the distribution of the package, they need to be as compact as
-possible. The `html_pretty` output format in package
-[**prettydoc**](https://github.com/yixuan/prettydoc/) , an alternative
-to `html_document` and `html_vignette` contained in the `rmarkdown` package,
-is able to generate small and nice HTML pages.
 
-## Styles
+## compileData()
 
-Currently `html_pretty` supports three page themes, `cayman` (the default),
-`tactile`, and `architect`. And there are also two syntax highlight styles:
-`github` to mimic the syntax highlight on Github, and `vignette` that is used by
-`html_vignette`. If no highlight parameter is given, the default style created
-by Pandoc will be used.
+The function `compileData()` will make your long list of temetry data files into one single `.RData` file, which can be used in the rest of the package.
 
-The theme and highlight styles can be given in the document metadata,
-for example:
+The function will also identify the columns of your files. We did this because all telemetry systems may organize their data slightly differently and we wanted `ATfiltR` to be useable as broadly as possible. So, there is going to be a little dialogue between you and the programm, in order to identify the different columns.
 
-```yaml
-output:
-  prettydoc::html_pretty:
-    theme: cayman
-    highlight: github
+<br />
+<br />  
+
+### General arguments  
+
+```{r, eval=F}
+compileData(detection.folder="Detections", file.ext=".csv",
+            sep.type=",", save=TRUE, remove.duplicates=T, 
+            save.duplicates=F, split=T)
 ```
 
-## Happy Knitting!
+**detection.folder**  
+<hr />
 
-Feel free to use the `knitr` infrastructure with dozens of tunable options in
-your package vignette.
+You should have an R project, and within the project directory you should have a folder that contains all of your telemetry data files. Indicate the name of the folder in quotation marks. By default we indicated "Detections".
 
-```{r fig.width=6, fig.height=6, fig.align='center'}
-set.seed(123)
-n <- 1000
-x1  <- matrix(rnorm(n), ncol = 2)
-x2  <- matrix(rnorm(n, mean = 3, sd = 1.5), ncol = 2)
-x   <- rbind(x1, x2)
-head(x)
-smoothScatter(x, xlab = "x1", ylab = "x2")
-```
+**file.ext**  
+<hr />
 
-You can also include code snippets of languages other than R, but note that
-the block header has no curly brackets around the language name.
+Indicate what the extension of your data files is. This is usually `.csv` but your files can also be in other "value separated" format like `.txt`. ATfiltR will ignore all files that are stored in the `detection.folder` but don't have the indicated `file.ext`. By default we indicated ".csv".
 
-```cpp
-// [[Rcpp::export]]
-NumericVector timesTwo(NumericVector x) {
-    return x * 2;
-}
-```
 
-You can write math expressions, e.g. $Y = X\beta + \epsilon$,
-footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+**sep.type**  
+<hr />
 
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(iris, 10))
-```
+What character separates the columns in your data files. By default we indicated ",".
 
-## Stay Tuned
+**save**  
+<hr />
 
-Please visit the [development page](https://github.com/yixuan/prettydoc/) of the 
-`prettydoc` package for latest updates and news. Comments, bug reports and
-pull requests are always welcome.
+Would you like to save the data compiled by `ATfiltR`. Default is `TRUE`.
+
+**remove.duplicates**  
+<hr />
+
+Would you like `ATfiltR` to identify and remove duplicated detections (same tag ID, same receiver ID, same Timestamp). Default is `TRUE`.
+
+
+**save.duplicates**  
+<hr />
+
+Would you like `ATfiltR` to save the removed duplicates as a data.frame is your `detection.folder`. Default is `TRUE`.
+
+
+**split**  
+<hr />
+
+Should `ATfiltR` compile your data little by little, in batches. This is recommended especially if you have a LOT of data. It will prevent R from crashing due to memory issues. Default is `TRUE`.
+
+
+<br />
+<br />  
+
+### Sneak peek into running the function  
+
+Once the arguments are all set, you will run the function. This function requires some input from you. We purposefully made it interactive to make it usable across data formats. 
+You will need to identify the *Timestamp*, *Transmitter ID*, *Receiver ID* columns for instance. 
+`ATfiltR` will ask you questions, which you can answer in the console. Here are a few example screenshots.
 

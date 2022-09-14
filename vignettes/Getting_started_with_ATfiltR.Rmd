@@ -1,6 +1,6 @@
 ---
 title: "Getting started with ATfiltR"
-author: "Félicie Dhellemmes"
+author: "ATfiltR Team"
 date: "`r Sys.Date()`"
 output:
   prettydoc::html_pretty:
@@ -43,6 +43,8 @@ knitr::include_graphics("New-project.PNG")
 <br />
 <br />
 
+**Saving your data within the project directory**
+
 Once your project is created (*you can name it anything you want*), you will need to put all the data you wish to use in a folder within the project directory. That way ATfiltR can find it. Below is an example of what this looks like.
 
 <br />
@@ -56,6 +58,8 @@ knitr::include_graphics("In-the-project-folder.PNG")
 
 <br />
 <br />
+
+**Opening your project in R Studio**
 
 To work with ATfiltR, you'll have to make sure that your project is opened in R. You can see that on the top right of the R studio window. 
 
@@ -72,6 +76,6 @@ knitr::include_graphics("Project-R-view.PNG")
 <br />
 
 **Your project is all set, and your telemetry data is stored in a folder within it?**  
-You are ready to go!
+**You are ready to go!**
 
-First stop: compileData()
+First stop: [**compileData()**](CompileDatavignette.html)
