@@ -10,22 +10,28 @@
 
 **ATfiltR** is one solution for:  
 - compiling your acoustic telemetry detection files  
-- removing duplicates (and save them elsewhere)  
-- attributing animal ID to detections (and save tags that don’t belong
-to you elsewhere)  
-- removing detections which fall outside of the deployment period  
+- removing duplicates (and saving them elsewhere)  
+- attributing animal ID and location attributes to detections (and
+saving tags that don’t belong to you elsewhere)  
+- removing detections which fall outside of the deployment period (and
+saving them elsewhere)  
 - filtering ghost detections via a (customizable) “solitary detections”
-filter  
-- filtering ghost detections via a (customizable) “swimming speed filter
+filter (and saving them elsewhere)  
+- filtering ghost detections via a (customizable) “swimming speed”
+filter (and saving them elsewhere)
 
 It is meant as an automatic way to process a lot of data and filter
 detections in bulk, based on set rules (e.g. speed) and with limited
 user input (i.e. you will not choose what detections are to be kept or
-erased each time an irregularity is found). Finer, fully user
-interactive filtering (and other cool stuff) is available on the package
-[actel](https://github.com/hugomflavio/actel), and we provide here a
-function that allows you to prepare data that you processed in ATfiltR
-for basic use in actel.
+erased each time an irregularity is found). We designed ATfiltR to be a
+little “formatting” intensive for the user, and we are hopeful that
+using it is straightforward for all.
+
+Finer, fully user interactive filtering (and other cool stuff) is
+available in the package [actel](https://github.com/hugomflavio/actel),
+and we provide here a function that allows you to prepare data that you
+processed in ATfiltR for basic use in actel (to save you the headache of
+reformatting everything).
 
 ![](vignettes/ATfiltR-graph-abstract.png)
 
@@ -38,3 +44,7 @@ You can install the development version of ATfiltR from
 # install.packages("devtools")
 devtools::install_github("FelicieDh/ATfiltR")
 ```
+
+## Using ATfiltR
+
+[Getting started](https://github.com/)
