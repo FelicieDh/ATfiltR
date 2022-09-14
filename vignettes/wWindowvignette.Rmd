@@ -1,5 +1,5 @@
 ---
-title: "compileData()"
+title: "wWindow()"
 author: "ATfiltR Team"
 date: "`r Sys.Date()`"
 output:
@@ -12,16 +12,25 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-OK, you should have a project openned in R, and your detections should be stored in a sub-folder of the project. 
+You have compiled you data and removed the duplicates (or not).
+The next step is to attribute your animal ID to detections and your spatial information, as well as to filter out detections that are logged outside of your deployment period or by other tgas.
 
-If that's not the case, [**Go back here**](Getting_started_with_ATFiltR.html)
+If You haven't compiled things, [**Go back here**](CompileDatavignette.html)
 
 
-## compileData()
+## wWindow()
 
-The function `compileData()` will make your long list of temetry data files into one single `.RData` file, which can be used in the rest of the package.
+The function `wWindow()` will use your previously compiled `.RData` file.
+It will match animal ID to their tags (as well as any other data you would like to add).
+It will match receiver location to the receivers (as well as any other data you would like to add).
+It will then remove data that doesn't belong to you or is outside of your deployment period and save it in a separate file (if you want).
 
-The function will also identify the columns of your files. We did this because all telemetry systems may organize their data slightly differently and we wanted `ATfiltR` to be useable as broadly as possible. So, there is going to be a little dialogue between you and the programm, in order to identify the different columns.
+<br />
+<br />  
+
+### Pre requisites  
+
+
 
 <br />
 <br />  
@@ -82,5 +91,3 @@ Once the arguments are all set, you will run the function. This function require
 You will need to identify the *Timestamp*, *Transmitter ID*, *Receiver ID* columns for instance. 
 `ATfiltR` will ask you questions, which you can answer in the console. Here are a few example screenshots.
 
-
-Next stop: [**wWindow()**](wWindowVignette.html)
