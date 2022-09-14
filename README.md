@@ -47,4 +47,13 @@ devtools::install_github("FelicieDh/ATfiltR")
 
 ## Using ATfiltR
 
-[Getting started](https://github.com/)
+You will need to get an [RStudio
+Project](https://support.rstudio.com/hc/en-us/articles/200526207-Using-RStudio-Projects)
+set up, and to store your data inside it.
+
+We **strongly** recommend that you read the vignettes, they are the
+package’s manual!
+
+``` r
+browseVignettes("ATfiltR")
+```
