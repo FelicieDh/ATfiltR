@@ -41,8 +41,8 @@ You can install the development version of ATfiltR from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("FelicieDh/ATfiltR")
+#install.packages("remotes") ##If remotes is not already installed
+remotes::install_github("FelicieDh/ATfiltR", build_opts = c("--no-resave-data", "--no-manual"), build_vignettes = TRUE)
 ```
 
 ## Using ATfiltR
