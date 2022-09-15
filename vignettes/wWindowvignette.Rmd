@@ -7,7 +7,7 @@ output:
     theme: hpstr
     highlight: github
 vignette: >
-  %\VignetteIndexEntry{2. compileData()}
+  %\VignetteIndexEntry{3. wWindow()}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
