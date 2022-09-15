@@ -112,7 +112,7 @@ speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver
 
   if(!is.na(suppressWarnings(as.numeric(receiver.range)))) {
     cat("Range of", crayon::cyan(receiver.range),"meters, as per user command. If this is not correct, [escape] and start again.", " \n")
-    Catergory<-"All"
+    Category<-"All"
     Range.m<-receiver.range
     Time.step<-"All"
     range<-as.data.frame(cbind(Category, Range.m, Time.step))
