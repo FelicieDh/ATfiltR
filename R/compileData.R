@@ -712,7 +712,7 @@ if (split==T){
       myView(detects[1:5,])
       no.cor<-scan("",what="character",nmax=1,fill=T, quiet=T)
 
-      if (length(no.cor)==1 & (no.cor=="n" | as.numeric(no.cor) %in% 1:ncol(detects))) {break}
+      if (length(no.cor)==1 & (no.cor=="n" | as.numeric(as.factor(no.cor)) %in% 1:ncol(detects))) {break}
     }
   }
 }
