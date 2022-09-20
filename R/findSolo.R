@@ -126,19 +126,19 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
 
   ATfiltR_data.2$Lag.before<-as.numeric(NA)
   ATfiltR_data.2$Lag.after<-as.numeric(NA)
-  ATfiltR_data.2[!is.na(Time.before), Lag.before := as.numeric(difftime(ATfiltR_data.2[!is.na(Time.before),Date.and.Time],
-                                                                                       ATfiltR_data.2[!is.na(Time.before),Time.before], units="hours"))]
-  ATfiltR_data.2[!is.na(Time.after), Lag.after := as.numeric(difftime(ATfiltR_data.2[!is.na(Time.after),Time.after],
-                                                                                     ATfiltR_data.2[!is.na(Time.after),Date.and.Time], units="hours"))]
+  ATfiltR_data.2[!is.na(ATfiltR_data.2$Time.before), Lag.before := as.numeric(difftime(ATfiltR_data.2[!is.na(ATfiltR_data.2$Time.before),Date.and.Time],
+                                                                                       ATfiltR_data.2[!is.na(ATfiltR_data.2$Time.before),Time.before], units="hours"))]
+  ATfiltR_data.2[!is.na(ATfiltR_data.2$Time.after), Lag.after := as.numeric(difftime(ATfiltR_data.2[!is.na(ATfiltR_data.2$Time.after),Time.after],
+                                                                                     ATfiltR_data.2[!is.na(ATfiltR_data.2$Time.after),Date.and.Time], units="hours"))]
 
   if (per.receiver==T){
 
-    ATfiltR_data.2$Lag.before.PR<-as.numeric(NA)
-    ATfiltR_data.2$Lag.after.PR<-as.numeric(NA)
-    ATfiltR_data.2[!is.na(Time.before.PR), Lag.before.pR := as.numeric(difftime(ATfiltR_data.2[!is.na(Time.before.PR),Date.and.Time],
-                                                                                               ATfiltR_data.2[!is.na(Time.before.PR),Time.before.pR], units="hours"))]
-    ATfiltR_data.2[!is.na(Time.after.PR), Lag.after.pR := as.numeric(difftime(ATfiltR_data.2[!is.na(Time.after.PR),Time.after.pR],
-                                                                                             ATfiltR_data.2[!is.na(Time.after.PR),Date.and.Time], units="hours"))]
+    ATfiltR_data.2$Lag.before.pR<-as.numeric(NA)
+    ATfiltR_data.2$Lag.after.pR<-as.numeric(NA)
+    ATfiltR_data.2[!is.na(Time.before.pR), Lag.before.pR := as.numeric(difftime(ATfiltR_data.2[!is.na(Time.before.pR),Date.and.Time],
+                                                                                               ATfiltR_data.2[!is.na(Time.before.pR),Time.before.pR], units="hours"))]
+    ATfiltR_data.2[!is.na(Time.after.pR), Lag.after.pR := as.numeric(difftime(ATfiltR_data.2[!is.na(Time.after.pR),Time.after.pR],
+                                                                                             ATfiltR_data.2[!is.na(Time.after.pR),Date.and.Time], units="hours"))]
 
     ATfiltR_data.2[, Solo := "No"]
 
