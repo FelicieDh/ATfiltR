@@ -86,7 +86,7 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
     cat("Ordering the data chronologically...", " \n")
 
     ATfiltR_data.2<-ATfiltR_data.2[order(ATfiltR_data.2$Date.and.Time),]
-    ATfiltR_data.2<<-as.data.tableATfiltR_data.2
+    ATfiltR_data.2<<-as.data.table(ATfiltR_data.2)
 
   }
 
