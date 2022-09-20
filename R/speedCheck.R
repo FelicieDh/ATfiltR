@@ -416,7 +416,7 @@ if (project==T){
 
         distances[lower.tri(distances, diag = TRUE)]<-NA
 
-        dist.long<-data.table(
+        dist.long<-data.frame(
           row = rep(row.names(distances), ncol(distances)),
           col = rep(colnames(distances), each = nrow(distances)),
           value = as.vector(distances)
