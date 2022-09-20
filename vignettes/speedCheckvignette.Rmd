@@ -161,4 +161,4 @@ If `project=FALSE` What is the name of the column in your dataframe that contain
 <br />
 <br />  
 
-Next stop: [**toActel()**](wWindowVignette.html)
+Next stop: [**toActel()**](toActelVignette.html)

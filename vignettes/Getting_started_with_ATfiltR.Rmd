@@ -40,7 +40,7 @@ Check out [findSolo()](findSolovignette.html)
 
 and  
 
-[speedCheck()](https://support.rstudio.com/hc/en-us/articles/200526207-Using-RStudio-Projects), for more details on how to do that.
+[speedCheck()](speedCheckvignette.html), for more details on how to do that.
 
 
 ### Creating the RStudio Project  
