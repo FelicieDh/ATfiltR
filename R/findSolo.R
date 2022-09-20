@@ -80,7 +80,7 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
     ATfiltR_data.2[,"Date.and.Time"] <- lubridate::parse_date_time(ATfiltR_data.2$Date.and.Time, c("Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS"), truncated = 3)
     ATfiltR_data.2[,"Date.and.Time"] <- as.POSIXct(ATfiltR_data.2$Date.and.Time, format="%Y-%m-%d %H:%M:%S")
 
-    ATfiltR_data.2[,"Station.name"] <- as.character(ATfiltR_data.2[,which(colnames(ATfiltR_data.2))==Station.col ])
+    ATfiltR_data.2[,"Station.name"] <- as.character(ATfiltR_data.2[,which(colnames(ATfiltR_data.2)==Station.col) ])
 
 
     cat("Ordering the data chronologically...", " \n")
