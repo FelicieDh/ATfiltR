@@ -1,0 +1,164 @@
+---
+title: "speedCheck()"
+author: "ATfiltR Team"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+vignette: >
+  %\VignetteIndexEntry{3. wWindow()}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+`speedCheck()` is one of two functions that can operate appart from an R project.
+If you wish to do you full data processing with `ATfiltR`, make sure you have [**compiled your data**](CompileDatavignette.html),[**attributed deployments and animals**](wWindowvignette.html) to it and (optionally) [**looked for solitary detections**](findSolovignette.html).
+
+If you want to use this function as a standalone, just indicate `project=FALSE` and the relevant names in the arguments `data.file`,`ID.col`, `DateTime.col` and `Station.col`. More on this below.
+
+## speedCheck()
+
+The function `speedCheck()` will use your previously compiled `.RData` file (or your loaded `data.file`, if `project=FALSE`.
+It will identify as spurious detections that occur too fast on a receiver given the distance from this receiver to the previous one, the range of the receivers and the speed of the animal.
+
+<br />
+<br />  
+
+### Pre requisites  
+
+**Distance matrix**
+
+You will need to store in your data.folder (or your working direction if project=FALSE) a distance matrix. The row names and the column names should correspond exactly to the name you gave your stations in your detections data.
+Each cell in the matrix should indicate the distance in meters between the two places.
+
+```{r, echo =F }
+fakedist<-data.frame(Tatooine = c(0, 4066769, 11542686),
+                     Hoth = c(4066769, 0, 7881555),
+                     Endor = c(11542686, 7881555, 0))
+row.names(fakedist)<-c("Tatooine","Hoth","Endor")
+knitr::kable(fakedist, Caption="Example of the distance matrix", booktabs = T) 
+```
+
+There is a great function to make in [actel](https://github.com/hugomflavio/actel):  `distancesMatrix()` set as `actel=FALSE`.
+But you can also make it yourself, and save it as a data.frame.
+
+
+**optional: Range table**
+
+You can store in your data.folder (or your working direction if project=FALSE) a file that contains range data. It has three columns:
+
+*Time step*
+This indicates the time intervals between different range measurments. It needs to be in a standard time format. For example if you have monthly data it should be in the "%Y-%m" format.
+
+*Range category*
+This indicates the group of receivers to which the range data applies. It must have a matching column in the detection data. If al receivers get different ranges, the name can be the uniaue name of the stations. If multiple receivers have the same range, they can share a name.
+
+At least one of *Range category* or *Time step* must appear in your dataframe. But if one of the two is missing that's okay.
+
+*Range*
+This indicates the range of the receiver in meters.
+
+
+```{r, echo =F }
+fakerange<-data.frame(Category = c("Tatooine+Hoth","Tatooine+Hoth","Endor","Endor"),
+                     TimeStep = c("2020-11","2020-12","2020-11","2020-12"),
+                     Range = c(1000, 1100, 300,500))
+
+knitr::kable(fakerange, Caption="Example of the ranges", booktabs = T) 
+
+```
+<br />
+<br />  
+
+### General arguments  
+
+```{r, eval=F}
+speedCheck(detection.folder="Detections", data.folder="Data",
+                     receiver.range=NA, base=1000, factor=NA, exponent=NA,
+                     max.distance=NA, save.speedy=TRUE, save=TRUE, project=TRUE,
+                     data.file="data", ID.col="ID", DateTime.col="Date.and.Time",
+                     Station.col="Station.name")
+```
+
+**detection.folder**  
+<hr />
+
+You should have an R project, and within the project directory you should have a folder that contains your ATfiltR files. Indicate the name of the folder in quotation marks. By default we indicated "Detections". (will only be used if `project=TRUE`)
+
+**data.folder**  
+<hr />
+
+You should have an R project, and within the project directory you should have a folder that contains all of your other (non-telemetry) data files. Indicate the name of the folder in quotation marks. By default we indicated "Data". *This can be the same as detection.folder* (will only be used if `project=TRUE`, if `project=FALSE` the data must be in your working directory)
+
+
+**receiver.range**  
+<hr />
+What is the range, in meters of the receivers? If your have a rnage table that you wish to use, leave as `NA`.
+
+
+**base**  
+<hr />
+
+The base of the equation used for speed calculation (in m/s). For instance, if the speed is calculated is speed=2*body_length^0.015, the base is 2. If the speed is the same for all fish, for instance 10m/s, the base is 10.
+
+
+**factor**  
+<hr />
+
+The column name for the data to use in the speed calculation. For instance, if speed=2*body_length^0.015, “factor” is the name of the column that contains the necessary body length data, in quotation marks `"body_length"`. If the speed doesn't depend on data in your dataset, keep as `NA`.
+
+**exponent**  
+<hr />
+
+The exponent for the factor you indicated in your speed calculation. For instance, for speed=2*body_length^0.015, exponent is equal to 0.015
+
+**max.distance**  
+<hr />
+
+Would you like `ATfiltR` to remove detections if they are beyond a certain distance from each other?  Default: `NA`
+
+
+**save.speedy**  
+<hr />
+
+Would you like `ATfiltR` to save the speedy data as a data.frame in your `detection.folder` (or in your work directory if `project=FALSE`). Default is `TRUE`.
+
+
+**save**  
+<hr />
+
+Would you like to save the data compiled by `ATfiltR` in your `detection.folder` (or in your work directory if `project=FALSE`). Default is `TRUE`.
+
+
+
+**project**  
+<hr />
+
+Would you like `ATfiltR` to work within a project. Default is `TRUE`.
+
+**data.file**  
+<hr />
+
+If `project=FALSE` What is the name of the dataframe (loaded in your environment) that you would you like `ATfiltR` to use.
+
+**ID.col**  
+<hr />
+
+If `project=FALSE` What is the name of the column in your dataframe that contains the unique animal ID.
+
+**DateTime.col**  
+<hr />
+
+If `project=FALSE` What is the name of the column in your dataframe that contains the timestamp of the detections. The timestamps must be in one of the following formats: "Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS".
+
+**Station.col**  
+<hr />
+
+If `project=FALSE` What is the name of the column in your dataframe that contains the location name for the detection.
+
+
+<br />
+<br />  
+
+Next stop: [**toActel()**](wWindowVignette.html)

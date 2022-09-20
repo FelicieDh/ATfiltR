@@ -33,6 +33,17 @@ This means that you do **not** have to define a working directory (setwd()), we 
 Instead, all you have to do is to create an [RStudio Project](https://support.rstudio.com/hc/en-us/articles/200526207-Using-RStudio-Projects), and all the ATfiltR magic will happen within this project, no matter on which machine the project is being used.
 
 
+## Exceptions  
+There are **two functions** that you can use directly on a data.frame loaded in your R environment, with necessary folder set as work directory. 
+
+Check out [findSolo()](findSolovignette.html)
+
+and  
+
+[speedCheck()](https://support.rstudio.com/hc/en-us/articles/200526207-Using-RStudio-Projects), for more details on how to do that.
+
+
+### Creating the RStudio Project  
 <br />
 ```{r, out.width = "600px", echo=F}
 knitr::include_graphics("New-project.PNG")

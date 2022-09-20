@@ -1,0 +1,94 @@
+---
+title: "findSolo()"
+author: "ATfiltR Team"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+vignette: >
+  %\VignetteIndexEntry{3. wWindow()}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+`findSolo()` is one of two functions that can operate appart from an R project.
+If you wish to do you full data processing with `ATfiltR`, make sure you have [**compiled your data**](CompileDatavignette.html) and [**attributed deployments and animals**](wWindowvignette.html) to it.
+
+If you want to use this function as a standalone, just indicate `project=FALSE` and the relevant names in the arguments `data.file`,`ID.col`, `DateTime.col` and `Station.col`. More on this below.
+
+## findSolo()
+
+The function `findSolo()` will use your previously compiled `.RData` file (or your loaded `data.file`, if `project=FALSE`).
+It will identify as spurious detections that occur alone within a certain customizable time window. This can be applied on a per receiver basis or for the whole array.
+
+<br />
+<br />  
+
+
+### General arguments  
+
+```{r, eval=F}
+findSolo(detection.folder="Detections", save.solo=T, save=T, per.receiver=T,
+                   delay = 0.5, project=T, data.file="data", ID.col="ID", DateTime.col="Date.and.Time",
+                   Station.col="Station.name")
+```
+
+**detection.folder**  
+<hr />
+
+You should have an R project, and within the project directory you should have a folder that contains your ATfiltR files. Indicate the name of the folder in quotation marks. By default we indicated "Detections". (will only be used if `project=TRUE`)
+
+**save.solo**  
+<hr />
+
+Would you like `ATfiltR` to save the lonely data tas a data.frame is your `detection.folder` (or in your work directory if `project=FALSE`). Default is `TRUE`.
+
+
+**save**  
+<hr />
+
+Would you like to save the data compiled by `ATfiltR` in your `detection.folder` (or in your work directory if `project=FALSE`). Default is `TRUE`.
+
+**per.receiver**  
+<hr />
+
+Would you like `ATfiltR` to consider lonely detections if they are alone on a given receiver or on the whole array? If `TRUE` (default), it will be done per receiver.
+
+
+**delay**  
+<hr />
+
+Solitary detections are defined detections that are recorded *delay* hours after the previous one and *delay* hours before the subsequent one. If `delay=0.5`, the time frame is 0.5 hours before and 0.5 hours after.
+
+
+**project**  
+<hr />
+
+Would you like `ATfiltR` to work within a project. Default is `TRUE`.
+
+**data.file**  
+<hr />
+
+If `project=FALSE` What is the name of the dataframe (loaded in your environment) that you would you like `ATfiltR` to use.
+
+**ID.col**  
+<hr />
+
+If `project=FALSE` What is the name of the column in your dataframe that contains the unique animal ID.
+
+**DateTime.col**  
+<hr />
+
+If `project=FALSE` What is the name of the column in your dataframe that contains the timestamp of the detections. The timestamps must be in one of the following formats: "Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS".
+
+**Station.col**  
+<hr />
+
+If `project=FALSE` What is the name of the column in your dataframe that contains the location name for the detection.
+
+
+<br />
+<br />  
+
+Next stop: [**speedCheck()**](speedCheckvignette.html)

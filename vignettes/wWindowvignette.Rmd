@@ -13,7 +13,7 @@ vignette: >
 ---
 
 You have compiled you data and removed the duplicates (or not).
-The next step is to attribute your animal ID to detections and your spatial information, as well as to filter out detections that are logged outside of your deployment period or by other tgas.
+The next step is to attribute your animal ID to detections and your spatial information, as well as to filter out detections that are logged outside of your deployment period or by other tags.
 
 If You haven't compiled things, [**Go back here**](CompileDatavignette.html)
 
@@ -30,64 +30,93 @@ It will then remove data that doesn't belong to you or is outside of your deploy
 
 ### Pre requisites  
 
+You need in your data.folder three separate files (the names of the files and the column names within the files do not matter):
 
+**1. Contains info on your spatial data (i.e. Info on all the places where you deployed receivers)**  
+This must contain a **longitude** column, a **latitude** column, a **station name** column which represents the unique name of each location where receivers have been deployed, and (optionally) a range category column which indicates the names of the category used when attributing each receiver’s ranges (if receivers have different ranges; only relevant for future speedCheck()). Each row corresponds to one location (i.e. station) at which receivers have been deployed
 
+```{r, echo =F }
+fakespat<-data.frame(station = c("Tatooine", "Hoth", "Endor"),
+                     longitude = c(47.9255, 7.4483, -124.0046),
+                     latitude = c(34.7359, 60.5477, 41.2131))
+
+knitr::kable(fakespat, Caption="Example of the spatial data", booktabs = T) 
+```
+  
+**2. Contains info on your deployment data (i.e. Info time and places your receivers are deployed)**  
+This must contain a column with the **receiver ID** (in the same format as in the detection data), the **name of the location at which it is deployed** (station name, corresponding to the names in the spatial data file), the **date and time at which a receiver is deployed**, and the **date and time at which it is retrieved**. Each row corresponds to one deployment event (from deployment to retrieval) for a receiver. Receivers that are redeployed multiple times get multiple rows.  
+
+```{r, echo =F }
+fakedepl<-data.frame(receiverID = c(11111,22222,33333,22222),
+                     station = c("Tatooine", "Hoth", "Endor","Tatooine"),
+                     deployment.time = c("2020-10-01 12:32:11", "2020-10-01 14:25:08","2020-10-01 12:47:05", "2020-12-04 18:24:41"),
+                     retrieval.time = c("2020-12-04 11:33:02", "2020-12-04 12:02:45", "2021-03-12 06:58:47", "2021-03-12 08:03:13"))
+
+knitr::kable(fakedepl, Caption="Example of the deployment data", booktabs = T) 
+```
+
+**3. Contains info on your animal data (i.e. Info on the animals you tagged)** 
+  
+This must contain a **transmitter ID** column (in the same format as in your detection data) a **unique animal ID** column (to allow transmitters to be deployed consecutively in multiple animals), a **date and time column** (date and time of tag implantation). Each row corresponds to the tag implantation of one animal. If there are more rows per individual (e.g. recapture events), users may indicate a tag.status column in which to keep track of the events. If the animal data includes a column with the name of the location at which it was captured, the column can also be identified. 
+
+```{r, echo =F }
+fakeanimal<-data.frame(transmitterID = c(12365,12366,12367,12368),
+                     animalID = c("Ewok1", "Ewok2", "Wookie1","Tauntaun3"),
+                     Date.Time = c("2020-10-04 12:00:36", "2020-10-04 12:18:36","2020-10-08 02:22:10", "2020-12-26 20:18:31")
+)
+
+knitr::kable(fakeanimal, Caption="Example of the deployment data", booktabs = T) 
+```
 <br />
 <br />  
 
 ### General arguments  
 
 ```{r, eval=F}
-compileData(detection.folder="Detections", file.ext=".csv",
-            sep.type=",", save=TRUE, remove.duplicates=T, 
-            save.duplicates=F, split=T)
+wWindow(detection.folder="Detections", data.folder="Data", sep.type=",", save.out.of.deployment=F,
+                  save.unknown.tags=T, discard.first=24, save=T)
 ```
 
 **detection.folder**  
 <hr />
 
-You should have an R project, and within the project directory you should have a folder that contains all of your telemetry data files. Indicate the name of the folder in quotation marks. By default we indicated "Detections".
+You should have an R project, and within the project directory you should have a folder that contains all of your ATfiltR files. Indicate the name of the folder in quotation marks. By default we indicated "Detections".
 
-**file.ext**  
+**data.folder**  
 <hr />
 
-Indicate what the extension of your data files is. This is usually `.csv` but your files can also be in other "value separated" format like `.txt`. ATfiltR will ignore all files that are stored in the `detection.folder` but don't have the indicated `file.ext`. By default we indicated ".csv".
+You should have an R project, and within the project directory you should have a folder that contains all of your other (non-telemetry) data files. Indicate the name of the folder in quotation marks. By default we indicated "Data". *This can be the same as detection.folder*
 
 
 **sep.type**  
 <hr />
 
-What character separates the columns in your data files. By default we indicated ",".
+What character separates the columns in your data files 8the ones in the `data.folder`. By default we indicated ",".
 
 **save**  
 <hr />
 
 Would you like to save the data compiled by `ATfiltR`. Default is `TRUE`.
 
-**remove.duplicates**  
+**discard.first**  
 <hr />
 
-Would you like `ATfiltR` to identify and remove duplicated detections (same tag ID, same receiver ID, same Timestamp). Default is `TRUE`.
+Would you like `ATfiltR` to discard the **N** first hours fo data after deploying a tag should be discarded? (e.g. 24 = the first 24h will be discarded). If `save.unknown.tags` is TRUE the discarded data will be saved in the unknown tags file.
 
 
-**save.duplicates**  
+**save.out.of.deployment**  
 <hr />
 
-Would you like `ATfiltR` to save the removed duplicates as a data.frame is your `detection.folder`. Default is `TRUE`.
+Would you like `ATfiltR` to save the data that was out of your deployment times as a data.frame is your `detection.folder`. Default is `TRUE`.
 
 
-**split**  
+**save.unknown.tags**  
 <hr />
 
-Should `ATfiltR` compile your data little by little, in batches. This is recommended especially if you have a LOT of data. It will prevent R from crashing due to memory issues. Default is `TRUE`.
+Would you like `ATfiltR` to save the data from unknown tags as a data.frame is your `detection.folder`. Default is `TRUE`.
 
 
 <br />
 <br />  
 
-### Sneak peek into running the function  
-
-Once the arguments are all set, you will run the function. This function requires some input from you. We purposefully made it interactive to make it usable across data formats. 
-You will need to identify the *Timestamp*, *Transmitter ID*, *Receiver ID* columns for instance. 
-`ATfiltR` will ask you questions, which you can answer in the console. Here are a few example screenshots.
-
+Next stop: [**findSolo()**](findSolovignette.html)

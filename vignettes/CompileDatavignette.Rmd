@@ -80,7 +80,11 @@ Should `ATfiltR` compile your data little by little, in batches. This is recomme
 
 Once the arguments are all set, you will run the function. This function requires some input from you. We purposefully made it interactive to make it usable across data formats. 
 You will need to identify the *Timestamp*, *Transmitter ID*, *Receiver ID* columns for instance. 
-`ATfiltR` will ask you questions, which you can answer in the console. Here are a few example screenshots.
+`ATfiltR` will ask you questions, which you can answer in the console. Here is an example screenshot.
 
+<br />
+```{r, out.width = "600px", echo=F}
+knitr::include_graphics("compiledatadate.PNG")
+```  
 
 Next stop: [**wWindow()**](wWindowVignette.html)
