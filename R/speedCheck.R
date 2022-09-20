@@ -700,10 +700,10 @@ if (project==T){
     cat("Saving the data that happenned too fast ...", " \n")
     if (project==T){
     save(ATfiltR_speedy.data, file=here::here(detection.folder, paste0("ATfiltR_speedy.data_", Sys.Date(),".RData")))
-    cat("File saved in your Detections folder under", paste0("ATfiltR_speedy.data_", Sys.Date(),".RData"), " \n")
+    cat(crayon::bold("File saved in your Detections folder under"), crayon::bold$cyan(paste0("ATfiltR_speedy.data_", Sys.Date(),".RData"), " \n"))
 } else{
   save(ATfiltR_speedy.data, file=paste0(getwd(), "/ATfiltR_speedy.data_", Sys.Date(),".RData"))
-  cat("File saved in ", paste0(getwd(), "/ATfiltR_speedy.data_", Sys.Date(),".RData"), " \n")}
+  cat(crayon::bold("File saved in "), crayon::bold$cyan(paste0(getwd(), "/ATfiltR_speedy.data_", Sys.Date(),".RData"), " \n"))}
 }
 
   if (save==TRUE){
@@ -711,10 +711,10 @@ if (project==T){
 
     if (project == T){
     save(ATfiltR_data.4, file=here::here(detection.folder, paste0("ATfiltR_data.4_", Sys.Date(),".RData")))
-    cat("File saved in your Detections folder under", paste0("ATfiltR_data.4_", Sys.Date(),".RData"), " \n")
+    cat(crayon::bold("File saved in your Detections folder under"), crayon::bold$cyan(paste0("ATfiltR_data.4_", Sys.Date(),".RData"), " \n"))
   } else {
     save(ATfiltR_data.4, file= paste0(getwd(),"/ATfiltR_data.4_", Sys.Date(),".RData"))
-    cat("File saved in ", paste0(getwd(),"/ATfiltR_data.4_", Sys.Date(),".RData"), " \n")
+    cat(crayon::bold("File saved in "), crayon::bold$cyan(paste0(getwd(),"/ATfiltR_data.4_", Sys.Date(),".RData"), " \n"))
   }
 }
 
