@@ -117,9 +117,11 @@ if (project==T){
 
 
   } else {
-
+    if (project==T){
     print(data.frame(Number=1:length(dir(here::here(data.folder), pattern=c(".txt|.csv"))),File=dir(here::here(data.folder), pattern=c(".txt|.csv"))))
-
+    } else {
+      print(data.frame(Number=1:length(dir(getwd(), pattern=c(".txt|.csv"))),File=dir(getwd(), pattern=c(".txt|.csv"))))
+}
     repeat{ ##r1 for range data
       cat("\n",crayon::bold(" Please enter the number of the file that contains your range data (see choices above)"))
 
@@ -130,8 +132,11 @@ if (project==T){
 
       if(!is.na(suppressWarnings(as.numeric(range.df))) & suppressWarnings(as.numeric(range.df)) %in% 1:length(dir(here::here(data.folder), pattern=c(".txt|.csv")))) { ##check validity of depl
 
+        if(project==T){
         range<-read.table(here::here(data.folder,dir(here::here(data.folder), pattern=c(".txt|.csv"))[as.numeric(range.df)]), sep=",", header=T)
-
+        }else{
+        range<-read.table(paste0(getwd(),"/",dir(getwd(), pattern=c(".txt|.csv"))[as.numeric(range.df)]), sep=",", header=T)
+}
         cat("\n")
         print(head(range))
 
@@ -368,8 +373,11 @@ if (project==T){
 
   cat("Loading and preparing the distance matrix...", "\n")
 
+  if(project==T){
   print(data.frame(Number=1:length(dir(here::here(data.folder), pattern=c(".txt|.csv"))),File=dir(here::here(data.folder), pattern=c(".txt|.csv"))))
-
+  }else{
+  print(data.frame(Number=1:length(dir(getwd(), pattern=c(".txt|.csv"))),File=dir(getwd(), pattern=c(".txt|.csv"))))
+  }
   repeat{ ##r1 for range data
     cat("\n",crayon::bold(" Please enter the number of the file that contains your distance matrix (see choices above)"))
 
@@ -382,8 +390,11 @@ if (project==T){
     distmat<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
 
     if(!is.na(suppressWarnings(as.numeric(distmat))) & suppressWarnings(as.numeric(distmat)) %in% 1:length(dir(here::here(data.folder), pattern=c(".txt|.csv")))) { ##check validity of depl
-
+if (project==T){
       distances<-read.table(here::here(data.folder,dir(here::here(data.folder), pattern=c(".txt|.csv"))[as.numeric(distmat)]), sep=",", header=T, check.names = FALSE)
+} else{
+  distances<-read.table(paste0(getwd(),"/",dir(getwd(), pattern=c(".txt|.csv"))[as.numeric(distmat)]), sep=",", header=T, check.names = FALSE)
+}
 
       cat("\n")
       distances<-as.matrix(distances)
@@ -675,15 +686,24 @@ if (project==T){
 
   if (save.speedy==TRUE){
     cat("Saving the data that happenned too fast ...", " \n")
+    if (project==T){
     save(ATfiltR_speedy.data, file=here::here(detection.folder, paste0("ATfiltR_speedy.data_", Sys.Date(),".RData")))
-    cat("File saved in your Detections folder under", paste0("ATfiltR_speedy.data_", Sys.Date(),".RData"), " \n")}
-
+    cat("File saved in your Detections folder under", paste0("ATfiltR_speedy.data_", Sys.Date(),".RData"), " \n")
+} else{
+  save(ATfiltR_speedy.data, file=paste0(getwd(), "/ATfiltR_speedy.data_", Sys.Date(),".RData"))
+  cat("File saved in ", paste0(getwd(), "/ATfiltR_speedy.data_", Sys.Date(),".RData"), " \n")}
+}
 
   if (save==TRUE){
     cat("Saving the compiled file after speed.check filtering...", " \n")
+
+    if (project == T){
     save(ATfiltR_data.4, file=here::here(detection.folder, paste0("ATfiltR_data.4_", Sys.Date(),".RData")))
-    cat("File saved in your Detections folder under", paste0("ATfiltR_data.4_", Sys.Date(),".RData"), " \n")}
-
-
+    cat("File saved in your Detections folder under", paste0("ATfiltR_data.4_", Sys.Date(),".RData"), " \n")
+  } else {
+    save(ATfiltR_data.4, file= paste0(getwd(),"/ATfiltR_data.4_", Sys.Date(),".RData"))
+    cat("File saved in ", paste0(getwd(),"/ATfiltR_data.4_", Sys.Date(),".RData"), " \n")
+  }
+}
 
 } ##end of the function
