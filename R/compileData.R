@@ -35,9 +35,7 @@
 #'
 #'
 
-#gsub scan Sys.time cat dir c length as.character as.numeric repeat break for ncol exists if
 
-##package: here::here
 
 
 compileData<-function(detection.folder="Detections", file.ext=".csv",

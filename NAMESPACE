@@ -3,6 +3,7 @@
 export(compileData)
 export(findSolo)
 export(loadRData)
+export(loadSolo)
 export(myView)
 export(speedCheck)
 export(toActel)

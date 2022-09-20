@@ -9,11 +9,16 @@ findSolo(
   save.solo = T,
   save = T,
   per.receiver = T,
-  delay = 0.5
+  delay = 0.5,
+  project = T,
+  data = "data",
+  ID = "ID",
+  Date.and.Time = "Date.and.Time",
+  Station.name = "Station.name"
 )
 }
 \arguments{
-\item{detection.folder}{The name of the folder containing the detection data}
+\item{detection.folder}{The name of the folder containing the detection data (Used if project==T)}
 
 \item{save.solo}{Should the solitary detections be saved in the detections folder? (TRUE or FALSE)}
 
@@ -24,6 +29,17 @@ if FALSE the filtered detections will be in your R environment only}
 when they occur alone across the whole array.}
 
 \item{delay}{(hours) defines solitary detections: detections that are recorded *delay* hours after the previous one and *delay* hours before the subsequent one are considered solitary.}
+
+\item{project}{If TRUE (default) the work is done in your ATfiltR project.}
+
+\item{data}{The name of the data loaded in your R environment (used if project==F)}
+
+\item{ID}{The name of the column containing your animal IDs (used if project==F)}
+
+\item{Date.and.Time}{The name of the column containing your Date.and.Time (used if project==F),
+the Date.and.Time must be in one of the following formats: "Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS"}
+
+\item{Station.name}{The name of the column containing your stations ID (used if project==F)}
 }
 \value{
 A data frame object that contains the detections from your tags, wihtout solitary detections, another that contains the solitary detections
@@ -33,7 +49,7 @@ Finds and filters out the detections that are alone within a defined time window
 }
 \examples{
 \dontrun{
-# Before running the function, you must be in an R project that contains
+# If project==T: Before running the function, you must be in an R project that contains
 your detections folder and data folder, your data must be compiled via
 compileData(), and could (should) have already been filtered by wWindow()
 findSolo(detection.folder="Detections", save.solo=T, save=T, delay = 1)

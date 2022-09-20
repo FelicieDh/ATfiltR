@@ -3,21 +3,26 @@
 #' @description Finds and filters out the detections that are alone within a defined time window (delay).
 #'
 #'
-#' @param detection.folder The name of the folder containing the detection data
+#' @param detection.folder The name of the folder containing the detection data (Used if project==T)
 #' @param save.solo Should the solitary detections be saved in the detections folder? (TRUE or FALSE)
 #' @param save Should the data be saved in your detections folder (TRUE or FALSE)
 #' if FALSE the filtered detections will be in your R environment only
 #' @param delay (hours) defines solitary detections: detections that are recorded *delay* hours after the previous one and *delay* hours before the subsequent one are considered solitary.
 #' @param per.receiver If TRUE (default) the solitary detections are considered solitary when they occur alone on a given receiver (Similarly to Kessel et al. 2014). If FALSE they are considered solitary
 #' when they occur alone across the whole array.
-#'
+#' @param project If TRUE (default) the work is done in your ATfiltR project.
+#' @param data The name of the data loaded in your R environment (used if project==F)
+#' @param ID The name of the column containing your animal IDs (used if project==F)
+#' @param Date.and.Time The name of the column containing your Date.and.Time (used if project==F),
+#' the Date.and.Time must be in one of the following formats: "Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS"
+#' @param Station.name The name of the column containing your stations ID (used if project==F)
 #'
 #' @return A data frame object that contains the detections from your tags, wihtout solitary detections, another that contains the solitary detections
 #'
 #'
 #' @examples
 #' \dontrun{
-#' # Before running the function, you must be in an R project that contains
+#' # If project==T: Before running the function, you must be in an R project that contains
 #' your detections folder and data folder, your data must be compiled via
 #' compileData(), and could (should) have already been filtered by wWindow()
 #' findSolo(detection.folder="Detections", save.solo=T, save=T, delay = 1)
@@ -27,6 +32,7 @@
 #' @importFrom here here
 #' @import crayon
 #' @importFrom data.table shift
+#' @importFrom lubridate parse_date_time
 #'
 #' @importFrom utils View read.table write.table head
 #'
@@ -41,75 +47,45 @@
 ############################################################################
 
 
-findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.receiver=T, delay = 0.5){
+findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.receiver=T,
+                   delay = 0.5, project=T, data="data", ID="ID", Date.and.Time="Date.and.Time",
+                   Station.name="Station.name"){
+
 
 
   cat("\n","\n",crayon::bold$yellow("ATfiltR findSolo(): Find detections that are solitary within a certain time-span."))
   cat("\n")
   cat("\n","Bring me Solo, and the Wookie. They will suffer for this outrage!"," \n")
   cat("\n")
-  cat("\n",crayon::bold$underline$blue("Step 1: Loading your compiled detections from the compileData() function, possibly filtered via wWindow()..."))
-  cat("\n")
-  cat("\n")
-
-  start<-Sys.time()
-
-  ##############################################
-  ########## Defining the objects ##############
-  ##############################################
 
 
-  these.animals<-NA ##all the tags that you have in the detections data
-  Solo.number<-NA ##number of rows with Solo detections
+  if (project==T){
+    loadSolo(detection.folder=detection.folder)
 
-  ######################################################
-  ########## Loading ATfiltR_data.1 or .2 ##############
-  ######################################################
+  } else {
 
-  if(!exists("ATfiltR_data.2")){
-    path=here::here(detection.folder)
-    files <- dir(path, pattern ="^ATfiltR_data.*\\.RData$")
+    cat("\n",crayon::bold$underline$blue("Step 1: You are working outside of a project (project=F), let's check that your data is formatted properly..."))
+    cat("\n")
+    cat("\n")
 
-    if (length(files[which(is.na(as.numeric(substr(files, 14, 14))))]) >0) { ##checking for entries that aren't valid
-      files<-files[-which(is.na(as.numeric(substr(files, 14, 14))))]}
+    start<-Sys.time()
 
-    if (length(files[which(is.na(as.Date(substr(files, 16, 25))))]) >0) { ##checking for entries that aren't valid
-      files<-files[-which(is.na(as.Date(substr(files, 16, 25))))]}
+    ATfiltR_data.2<-as.data.table(get(data))
+    ATfiltR_data.2$ID<-ATfiltR_data.2[,which(colnames(ATfiltR_data.2==ID)) ]
+
+    ATfiltR_data.2$Date.and.Time<-ATfiltR_data.2[,which(colnames(ATfiltR_data.2==Date.and.Time)) ]
+    ATfiltR_data.2$Date.and.Time<-lubridate::parse_date_time(ATfiltR_data.2$Date.and.Time, c("Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS"), truncated = 3)
+    ATfiltR_data.2$Date.and.Time<-as.POSIXct(ATfiltR_data.2$Date.and.Time, format="%Y-%m-%d %H:%M:%S")
+
+    ATfiltR_data.2$Station.name<-ATfiltR_data.2[,which(colnames(ATfiltR_data.2==Station.name)) ]
 
 
-    if (length(files) == 0){
-      cat("No compiled detections found in your environment or Detections folder... Please compile your detections using compileData() first. You could (should) also pre-filter it with wWindow()", " \n")
-      stop("Run compileData() first...")
+    cat("Ordering the data chronologically...", " \n")
 
-    } else{
+    ATfiltR_data.2<-ATfiltR_data.2[order(ATfiltR_data.2$Date.and.Time),]
+    ATfiltR_data.2<<-ATfiltR_data.2
 
-      if (length(files[which(as.numeric(substr(files, 14, 14)) >2)]) >0){
-        files<-files[-which(as.numeric(substr(files, 14, 14)) >2)]
-
-        if (length(files) == 0){
-          cat("We only found detection files that had already been through findSolo() or speedCheck() in your Detections folder... Please re-compile your detections using compileData() first. You could (should) also pre-filter it with wWindow()", " \n")
-          stop("Run compileData() first...")
-        }
-      }
-
-      files.2<-files[which.max(as.numeric(substr(files, 14, 14)))]
-      cat("Compiled detections found in your environment. Loading the most recent (and most up-to-date) compilation:", crayon::cyan(paste(files.2[which.min(as.numeric(difftime(Sys.Date(),as.Date(substr(files.2, 16, 25)))))]), " \n"))
-      ATfiltR_data.2<-loadRData(here::here(detection.folder, files.2[which.min(difftime(Sys.Date(),as.Date(substr(files.2, 16, 25))))]))
-    }
   }
-
-  cat("\n")
-  cat(crayon::bold("Compiled detections found! Let's do this!", " \n"))
-
-  cat("Ordering the data chronologically...", " \n")
-
-  ATfiltR_data.2<-ATfiltR_data.2[order(ATfiltR_data.2$Date.and.Time),]
-  ATfiltR_data.2<<-ATfiltR_data.2
-
-
-
-
-
   cat("\n","\n",crayon::bold$underline$blue("Step 2: Calculating the delay between consecutive detections and defining solitary detections..."))
   cat("\n")
   cat("\n")
@@ -201,14 +177,25 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
     if (save.solo==TRUE){
       cat("\n")
       cat("You chose to save the solo detections!", " \n")
+      if(project==T){
       save(solo.detections, file=here::here(detection.folder, paste0("ATfilter_solo_", Sys.Date(),".RData")))
-      cat(crayon::bold("File saved in your detections folder under"), crayon::bold$cyan(paste0("ATfilter_solo_", Sys.Date(),".RData")), crayon::bold$cyan(" \n"))}
-
+      cat(crayon::bold("File saved in your detections folder under"), crayon::bold$cyan(paste0("ATfilter_solo_", Sys.Date(),".RData")), crayon::bold$cyan(" \n"))
+      } else {
+        save(solo.detections, file=paste0(getwd(),"/ATfilter_solo_", Sys.Date(),".RData"))
+        cat(crayon::bold("File saved in "), crayon::bold$cyan(paste0(getwd(),"/ATfilter_solo_", Sys.Date(),".RData")), crayon::bold$cyan(" \n"))
+      }
+      }
     if (save==TRUE){
       cat("\n")
       cat("You chose to save the detections after filtering out the solitary detections!", " \n")
+      if (project==T){
       save(ATfiltR_data.3, file=here::here(detection.folder, paste0("ATfiltR_data.3_", Sys.Date(),".RData")))
-      cat(crayon::bold("File saved in your detections folder under"), crayon::bold$cyan(paste0("ATfiltR_data.3_", Sys.Date(),".RData")), crayon::bold(" \n"))}
+      cat(crayon::bold("File saved in your detections folder under"), crayon::bold$cyan(paste0("ATfiltR_data.3_", Sys.Date(),".RData")), crayon::bold(" \n"))
+      }  else {
+        save(ATfiltR_data.3, file=paste0(getwd(),"/ATfiltR_data.3_", Sys.Date(),".RData"))
+        cat(crayon::bold("File saved in "), crayon::bold$cyan(paste0(getwd(),"/ATfiltR_data.3_", Sys.Date(),".RData")), crayon::bold(" \n"))
+      }
+      }
 
   } else if (Solo.number == 0) {
 
@@ -219,8 +206,16 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
     if (save==TRUE){
       cat("\n")
       cat("There weren't any solitary detections: Saving the compiled file without removing any detections...", " \n")
-      save(ATfiltR_data.3, file=here::here(detection.folder, paste0("ATfiltR_data.3_", Sys.Date(),".RData")))
-      cat(crayon::bold("File saved in your detections folder under"), crayon::bold$cyan(paste0("ATfiltR_data.3_", Sys.Date(),".txt")), crayon::bold(" \n"))}
+
+      if (project==T){
+        save(ATfiltR_data.3, file=here::here(detection.folder, paste0("ATfiltR_data.3_", Sys.Date(),".RData")))
+        cat(crayon::bold("File saved in your detections folder under"), crayon::bold$cyan(paste0("ATfiltR_data.3_", Sys.Date(),".RData")), crayon::bold(" \n"))
+      }  else {
+        save(ATfiltR_data.3, file=paste0(getwd(),"/ATfiltR_data.3_", Sys.Date(),".RData"))
+        cat(crayon::bold("File saved in "), crayon::bold$cyan(paste0(getwd(),"/ATfiltR_data.3_", Sys.Date(),".RData")), crayon::bold(" \n"))
+      }
+
+      }
   }
   cat("\n")
   cat("\n")
