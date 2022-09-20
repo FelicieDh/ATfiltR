@@ -11,11 +11,11 @@
 #' @param per.receiver If TRUE (default) the solitary detections are considered solitary when they occur alone on a given receiver (Similarly to Kessel et al. 2014). If FALSE they are considered solitary
 #' when they occur alone across the whole array.
 #' @param project If TRUE (default) the work is done in your ATfiltR project.
-#' @param data The name of the data loaded in your R environment (used if project==F)
-#' @param ID The name of the column containing your animal IDs (used if project==F)
-#' @param Date.and.Time The name of the column containing your Date.and.Time (used if project==F),
+#' @param data.file The name of the data loaded in your R environment (used if project==F)
+#' @param ID.col The name of the column containing your animal IDs (used if project==F)
+#' @param DateTime.col The name of the column containing your Date.and.Time (used if project==F),
 #' the Date.and.Time must be in one of the following formats: "Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS"
-#' @param Station.name The name of the column containing your stations ID (used if project==F)
+#' @param Station.col The name of the column containing your stations ID (used if project==F)
 #'
 #' @return A data frame object that contains the detections from your tags, wihtout solitary detections, another that contains the solitary detections
 #'
@@ -48,8 +48,8 @@
 
 
 findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.receiver=T,
-                   delay = 0.5, project=T, data="data", ID="ID", Date.and.Time="Date.and.Time",
-                   Station.name="Station.name"){
+                   delay = 0.5, project=T, data.file="data", ID.col="ID", DateTime.col="Date.and.Time",
+                   Station.col="Station.name"){
 
 
 
@@ -70,14 +70,14 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
 
     start<-Sys.time()
 
-    ATfiltR_data.2<-as.data.table(get(data))
-    ATfiltR_data.2$ID<-ATfiltR_data.2[,which(colnames(ATfiltR_data.2==ID)) ]
+    ATfiltR_data.2<-as.data.table(get(data.file))
+    ATfiltR_data.2$ID<-ATfiltR_data.2[,which(colnames(ATfiltR_data.2==ID.col)) ]
 
-    ATfiltR_data.2$Date.and.Time<-ATfiltR_data.2[,which(colnames(ATfiltR_data.2==Date.and.Time)) ]
+    ATfiltR_data.2$Date.and.Time<-ATfiltR_data.2[,which(colnames(ATfiltR_data.2==DateTime.col)) ]
     ATfiltR_data.2$Date.and.Time<-lubridate::parse_date_time(ATfiltR_data.2$Date.and.Time, c("Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS"), truncated = 3)
     ATfiltR_data.2$Date.and.Time<-as.POSIXct(ATfiltR_data.2$Date.and.Time, format="%Y-%m-%d %H:%M:%S")
 
-    ATfiltR_data.2$Station.name<-ATfiltR_data.2[,which(colnames(ATfiltR_data.2==Station.name)) ]
+    ATfiltR_data.2$Station.name<-ATfiltR_data.2[,which(colnames(ATfiltR_data.2==Station.col)) ]
 
 
     cat("Ordering the data chronologically...", " \n")
@@ -86,6 +86,7 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
     ATfiltR_data.2<<-ATfiltR_data.2
 
   }
+
   cat("\n","\n",crayon::bold$underline$blue("Step 2: Calculating the delay between consecutive detections and defining solitary detections..."))
   cat("\n")
   cat("\n")
