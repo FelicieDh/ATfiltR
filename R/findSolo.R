@@ -127,7 +127,7 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
   ATfiltR_data.2$Lag.before<-NA
   ATfiltR_data.2$Lag.after<-NA
   ATfiltR_data.2[!is.na(ATfiltR_data.2$Time.before), Lag.before := as.numeric(difftime(ATfiltR_data.2[!is.na(ATfiltR_data.2$Time.before),Date.and.Time],
-                                                                                       ATfiltR_data.2ATfiltR_data.2[!is.na(ATfiltR_data.2$Time.before),Time.before], units="hours"))]
+                                                                                       ATfiltR_data.2[!is.na(ATfiltR_data.2$Time.before),Time.before], units="hours"))]
   ATfiltR_data.2[!is.na(ATfiltR_data.2$Time.after), Lag.after := as.numeric(difftime(ATfiltR_data.2[!is.na(ATfiltR_data.2$Time.after),Time.after],
                                                                                      ATfiltR_data.2[!is.na(ATfiltR_data.2$Time.after),Date.and.Time], units="hours"))]
 
