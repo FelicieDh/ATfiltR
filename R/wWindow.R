@@ -986,4 +986,4 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
   cat(crayon::bold$yellow("End of process for the within window filtering. The filtered detections are in your R environment under ATfiltR_data.2 !"))
   cat(crayon::bold$yellow("This took approximately", paste(round(difftime(Sys.time(), start, units="min"))), "minutes!"," \n"))
 
-}##end of function
+} ##end of function
