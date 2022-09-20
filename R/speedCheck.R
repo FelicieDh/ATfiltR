@@ -413,7 +413,12 @@ if (project==T){
       if (check=="y"){
 
         distances[lower.tri(distances, diag = TRUE)]<-NA
-        dist.long<-data.table::melt(distances)
+        distances<-as.matrix(distances)
+        dist.long<-data.table(
+          row = rep(row.names(distances), ncol(distances)),
+          col = rep(colnames(distances), each = nrow(distances)),
+          value = as.vector(distances)
+        )
         dist.long<-dist.long[-which(is.na(dist.long[,3])),]
 
         break}} ##end of check validity of depl
