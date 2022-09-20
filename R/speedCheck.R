@@ -3,8 +3,8 @@
 #' @description Filters out detections that occur faster than the animal's speed (user provided)
 #'
 #'
-#' @param detection.folder The name of the folder containing the detection data
-#' @param data.folder The name of the folder containing auxillary data (e.g. spatial data). Can be se same af detection.folder
+#' @param detection.folder The name of the folder containing the detection data (Used if project==T)
+#' @param data.folder The name of the folder containing auxillary data (e.g. spatial data). Can be se same af detection.folder (Used if project==T)
 #' @param receiver.range Range of the receivers in meters (if the range is the same for all receivers and the whole study duration). Keep as NA if your range data is stored in a separate file (i.e. if you have different ranges for your stations).
 #' @param base The base of the equation you use for speed (in m/s). For instance if the speed is calculated is speed=2*body_length^0.015, the base is 2. If the speed is the same for all fish, for instance 10m/s, the base is 10.
 #' @param factor The column name for the data to use in the speed calculation. For instance is speed=2*body_length^0.015, indicate the name of the column that contains the necessary bodylength data, in quotation marks.
@@ -13,6 +13,12 @@
 #' @param max.distance Maximum distance (in meters) that an animal may move, and beyond which the detections should be removed. Default: NA
 #' @param save.speedy Should the detections that happened too fast be saved in the detections folder? (TRUE or FALSE)
 #' @param save Should the data be saved in your detections folder (TRUE or FALSE)
+#' @param project If TRUE (default) the work is done in your ATfiltR project.
+#' @param data.file The name of the data loaded in your R environment (used if project==F)
+#' @param ID.col The name of the column containing your animal IDs (used if project==F)
+#' @param DateTime.col The name of the column containing your Date.and.Time (used if project==F),
+#' the Date.and.Time must be in one of the following formats: "Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS"
+#' @param Station.col The name of the column containing your stations ID (used if project==F)
 #'
 #' @return A data frame object that contains the detections from your tags, filtered for speed, and another that contains the detections that were found to be occur too fast according to the user inputed speed.
 #'
@@ -109,7 +115,7 @@ if (project==T){
   if(!is.na(suppressWarnings(as.numeric(receiver.range)))) {
     cat("Range of", crayon::cyan(receiver.range),"meters, as per user command. If this is not correct, [escape] and start again.", " \n")
     Category<-"All"
-    Range.m<-receiver.range
+    Range.m<-as.numeric(receiver.range)
     Time.step<-"All"
     range<-as.data.frame(cbind(Category, Range.m, Time.step))
 
@@ -421,7 +427,7 @@ if (project==T){
           col = rep(colnames(distances), each = nrow(distances)),
           value = as.vector(distances)
         )
-        dist.long<-dist.long[-which(is.na(dist.long[,3])),]
+        dist.long<<-dist.long[-which(is.na(dist.long[,3])),]
 
         break}} ##end of check validity of depl
 
@@ -516,8 +522,8 @@ if (project==T){
 
   cat("\n")
 
-  ATfiltR_data.3[, Range.here := 500]
-  ATfiltR_data.3[, Range.previous := 500]
+  ATfiltR_data.3[, Range.here := as.numeric(500)]
+  ATfiltR_data.3[, Range.previous := as.numeric(500)]
 
   repeat{
 
@@ -530,9 +536,6 @@ if (project==T){
       cat("\n","(Calculations will get faster and faster: We only remake calculations on pairs of receivers that have had speed errors on the previous iteration)")
       cat("\n")
       cat("\n")
-
-      reduced.dist<-dist.long
-
 
     }
     cat("", " \n")
