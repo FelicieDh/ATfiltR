@@ -398,6 +398,8 @@ if (project==T){
 
       cat("\n")
       distances<-as.matrix(distances)
+      distances<-distances[which(rownames(distances) %in% unique(ATfiltR_data.3$Station.name)),
+                           which(colnames(distances) %in% unique(ATfiltR_data.3$Station.name))]
       print(head(distances))
 
 
@@ -413,7 +415,7 @@ if (project==T){
       if (check=="y"){
 
         distances[lower.tri(distances, diag = TRUE)]<-NA
-        distances<-as.matrix(distances)
+
         dist.long<-data.table(
           row = rep(row.names(distances), ncol(distances)),
           col = rep(colnames(distances), each = nrow(distances)),
