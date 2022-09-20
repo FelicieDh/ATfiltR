@@ -43,7 +43,11 @@
 ############################################################################
 ############################################################################
 
-speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver.range=NA, base=1000, factor=NA, exponent=NA, max.distance=NA, save.speedy=TRUE, save=TRUE){
+speedCheck<-function(detection.folder="Detections", data.folder="Data",
+                     receiver.range=NA, base=1000, factor=NA, exponent=NA,
+                     max.distance=NA, save.speedy=TRUE, save=TRUE,
+                     data.file="data", ID.col="ID", DateTime.col="Date.and.Time",
+                     Station.col="Station.name"){
 
   cat("\n","\n",crayon::bold$yellow("ATfiltR speedCheck(): filtering detections that happen at an unreasonable speed."))
   cat("\n")

@@ -74,7 +74,7 @@ loadSpeed<-function(detection.folder="Detections"){
       files.2<-files[which.max(as.numeric(substr(files, 14, 14)))]
       cat("Compiled detections found in your environment. Loading the most recent (and most up-to-date) compilation:", crayon::cyan(paste(files.2[which.min(as.numeric(difftime(Sys.Date(),as.Date(substr(files.2, 16, 25)))))]), " \n"))
       ATfiltR_data.3<-loadRData(here::here(detection.folder, files.2[which.min(difftime(Sys.Date(),as.Date(substr(files.2, 16, 25))))]))
-  }
+  }}
   cat(" \n")
   cat(crayon::bold("Compiled detections found! Let's do this!", " \n"))
   ##Preparing the datetime as a POSIX and ordering the dataframe
@@ -85,5 +85,4 @@ loadSpeed<-function(detection.folder="Detections"){
 
   ATfiltR_data.3<<-ATfiltR_data.3
   cat("\n")
-
 }
