@@ -427,7 +427,7 @@ if (project==T){
           col = rep(colnames(distances), each = nrow(distances)),
           value = as.vector(distances)
         )
-        dist.long<<-dist.long[-which(is.na(dist.long[,3])),]
+        dist.long<-dist.long[-which(is.na(dist.long[,3])),]
 
         break}} ##end of check validity of depl
 
@@ -603,9 +603,9 @@ if (project==T){
     for (i in 1:nrow(reduced.range)){
       cat(" ","Adding the appropriate ranges", crayon::cyan(round(i/nrow(reduced.range)*100)), "%", " \r")
 
-      ATfiltR_data.3[.(reduced.range[i,"Category"], reduced.range[i,"Time.step"]), Range.here := reduced.range[i,"Range.m"], on=.(Range.category,Time.step)]
+      ATfiltR_data.3[.(reduced.range[i,"Category"], reduced.range[i,"Time.step"]), Range.here := as.numeric(reduced.range[i,"Range.m"]), on=.(Range.category,Time.step)]
 
-      ATfiltR_data.3[.(reduced.range[i,"Category"], reduced.range[i,"Time.step"]), Range.previous := reduced.range[i,"Range.m"], on=.(Previous.range.category,Time.step)]
+      ATfiltR_data.3[.(reduced.range[i,"Category"], reduced.range[i,"Time.step"]), Range.previous := as.numeric(reduced.range[i,"Range.m"]), on=.(Previous.range.category,Time.step)]
 
     }
     cat(" \n")
