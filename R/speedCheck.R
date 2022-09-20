@@ -45,7 +45,7 @@
 
 speedCheck<-function(detection.folder="Detections", data.folder="Data",
                      receiver.range=NA, base=1000, factor=NA, exponent=NA,
-                     max.distance=NA, save.speedy=TRUE, save=TRUE,
+                     max.distance=NA, save.speedy=TRUE, save=TRUE, project=TRUE,
                      data.file="data", ID.col="ID", DateTime.col="Date.and.Time",
                      Station.col="Station.name"){
 
