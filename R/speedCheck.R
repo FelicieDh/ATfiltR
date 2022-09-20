@@ -113,6 +113,8 @@ if (project==T){
     Time.step<-"All"
     range<-as.data.frame(cbind(Category, Range.m, Time.step))
 
+    ATfiltR_data.3$Range.category<-"All"
+
 
   } else {
 
