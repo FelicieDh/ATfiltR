@@ -47,11 +47,6 @@ speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver
 
   cat("\n","\n",crayon::bold$yellow("ATfiltR speedCheck(): filtering detections that happen at an unreasonable speed."))
   cat("\n")
-  cat("\n","\n",crayon::bold$underline$blue("Step 1: Loading your compiled detections, which also went through wWindow() and findSolo() function..."))
-  cat("\n","(Note: This is important because we need the time delays that are calculated during the findSolo() step
-      and the attribution of the range category from wWindow())")
-  cat("\n")
-  cat("\n")
 
   start<-Sys.time()
 
@@ -68,37 +63,34 @@ speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver
   ########## Loading ATfiltR_data.3 ##############
   ################################################
 
-  if(!exists("ATfiltR_data.3")){
-    path=here::here(detection.folder)
-    files <- dir(path, pattern ="^ATfiltR_data.3.*\\.RData$")
 
-
-    if (length(files[which(is.na(as.numeric(substr(files, 14, 14))))]) >0) { ##checking for entries that aren't valid
-      files<-files[-which(is.na(as.numeric(substr(files, 14, 14))))]}
-
-    if (length(files[which(is.na(as.Date(substr(files, 16, 25))))]) >0) { ##checking for entries that aren't valid
-      files<-files[-which(is.na(as.Date(substr(files, 16, 25))))]}
-
-    if (length(files) == 0){
-      cat("No valid compiled detections found in your environment or Detections folder... Please compile your detections using compileData() first andrun them through findSolo().", " \n")
-      stop("Run compileData(), wWindow() and findSolo() first...")
-    } else {
-      cat("Compiled detections found in your environment. Loading the most recent compilation:", crayon::cyan(paste(files[which.min(difftime(Sys.Date(),as.Date(substr(files, 16, 25))))]), " \n"))
-      load(here::here(detection.folder, files[which.min(difftime(Sys.Date(),as.Date(substr(files, 16, 25))))]))
-    }
-  }
-  cat(" \n")
-  cat(crayon::bold("Compiled detections found! Let's do this!", " \n"))
-  ##Preparing the datetime as a POSIX and ordering the dataframe
-  cat("Ordering the data chronologically...", " \n")
-
-  data.table::setkey(ATfiltR_data.3, Date.and.Time)
-
-
-  ATfiltR_data.3<<-ATfiltR_data.3
+if (project==T){
+  loadSpeed(detection.folder=detection.folder)
+}  else {
+  cat("\n",crayon::bold$underline$blue("Step 1: You are working outside of a project (project=F), let's check that your data is formatted properly..."))
+  cat("\n")
   cat("\n")
 
+  start<-Sys.time()
 
+  ATfiltR_data.3<-as.data.frame(get(data.file))
+
+  ATfiltR_data.3[,"ID"] <- as.character(ATfiltR_data.3[,which(colnames(ATfiltR_data.3)==ID.col )])
+
+  ATfiltR_data.3[,"Date.and.Time"] <- as.character(ATfiltR_data.3[,which(colnames(ATfiltR_data.3)==DateTime.col) ])
+
+  ATfiltR_data.3[,"Date.and.Time"] <- lubridate::parse_date_time(ATfiltR_data.3$Date.and.Time, c("Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS"), truncated = 3)
+  ATfiltR_data.3[,"Date.and.Time"] <- as.POSIXct(ATfiltR_data.3$Date.and.Time, format="%Y-%m-%d %H:%M:%S")
+
+  ATfiltR_data.3[,"Station.name"] <- as.character(ATfiltR_data.3[,which(colnames(ATfiltR_data.2)==Station.col) ])
+
+
+  cat("Ordering the data chronologically...", " \n")
+
+  ATfiltR_data.3<-ATfiltR_data.3[order(ATfiltR_data.3$Date.and.Time),]
+  ATfiltR_data.3<-data.table(ATfiltR_data.3)
+  ATfiltR_data.3<<-ATfiltR_data.3
+}
 
 
   ################################################
@@ -519,8 +511,8 @@ speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver
     }
     cat("", " \n")
 
-    i=3
-    if (t>0){
+
+
       for (i in 1:length(these.animals)){
 
         cat(" ","Calculating time between detections for each animal:", crayon::cyan(round(i/length(these.animals)*100)), "%", " \r")
@@ -544,7 +536,7 @@ speedCheck<-function(detection.folder="Detections", data.folder="Data", receiver
       ATfiltR_data.3[, Lag.before := as.numeric(difftime(ATfiltR_data.3$Date.and.Time, ATfiltR_data.3$Time.before, units="hours"))]
       ATfiltR_data.3[, Lag.after := as.numeric(difftime(ATfiltR_data.3$Time.after, ATfiltR_data.3$Date.and.Time, units="hours"))] ##calculate the delays
 
-    }
+
 
 
     for (i in 1:length(these.animals)){
