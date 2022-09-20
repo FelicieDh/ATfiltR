@@ -529,6 +529,8 @@ if (project==T){
       cat("\n")
       cat("\n")
 
+      reduced.dist<-dist.long
+
 
     }
     cat("", " \n")
