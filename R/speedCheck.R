@@ -92,7 +92,7 @@ if (project==T){
   ATfiltR_data.3[,"Date.and.Time"] <- lubridate::parse_date_time(ATfiltR_data.3$Date.and.Time, c("Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS"), truncated = 3)
   ATfiltR_data.3[,"Date.and.Time"] <- as.POSIXct(ATfiltR_data.3$Date.and.Time, format="%Y-%m-%d %H:%M:%S")
 
-  ATfiltR_data.3[,"Station.name"] <- as.character(ATfiltR_data.3[,which(colnames(ATfiltR_data.2)==Station.col) ])
+  ATfiltR_data.3[,"Station.name"] <- as.character(ATfiltR_data.3[,which(colnames(ATfiltR_data.3)==Station.col) ])
 
 
   cat("Ordering the data chronologically...", " \n")
