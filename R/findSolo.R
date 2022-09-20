@@ -70,23 +70,23 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
 
     start<-Sys.time()
 
-    ATfiltR_data.2<-as.data.table(get(data.file))
+    ATfiltR_data.2<-as.data.frame(get(data.file))
 
-    ATfiltR_data.2[,ID := as.character(ATfiltR_data.2[,which(colnames(ATfiltR_data.2)==ID.col) ])]
+    ATfiltR_data.2[,"ID"] <- as.character(ATfiltR_data.2[,which(colnames(ATfiltR_data.2)==ID.col )])
 
-    ATfiltR_data.2[,Date.and.Time := as.character(ATfiltR_data.2[,which(colnames(ATfiltR_data.2)==DateTime.col) ])]
+    ATfiltR_data.2[,"Date.and.Time"] <- as.character(ATfiltR_data.2[,which(colnames(ATfiltR_data.2)==DateTime.col) ])
     ATfiltR_data.2<<-ATfiltR_data.2
 
-    ATfiltR_data.2[,Date.and.Time := lubridate::parse_date_time(ATfiltR_data.2$Date.and.Time, c("Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS"), truncated = 3)]
-    ATfiltR_data.2[,Date.and.Time := as.POSIXct(ATfiltR_data.2$Date.and.Time, format="%Y-%m-%d %H:%M:%S")]
+    ATfiltR_data.2[,"Date.and.Time"] <- lubridate::parse_date_time(ATfiltR_data.2$Date.and.Time, c("Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS"), truncated = 3)
+    ATfiltR_data.2[,"Date.and.Time"] <- as.POSIXct(ATfiltR_data.2$Date.and.Time, format="%Y-%m-%d %H:%M:%S")
 
-    ATfiltR_data.2[,Station.name := as.character(ATfiltR_data.2[,which(colnames(ATfiltR_data.2)==Station.col) ])]
+    ATfiltR_data.2[,"Station.name"] := as.character(ATfiltR_data.2[,which(colnames(ATfiltR_data.2))==Station.col ])
 
 
     cat("Ordering the data chronologically...", " \n")
 
     ATfiltR_data.2<-ATfiltR_data.2[order(ATfiltR_data.2$Date.and.Time),]
-    ATfiltR_data.2<<-ATfiltR_data.2
+    ATfiltR_data.2<<-as.data.tableATfiltR_data.2
 
   }
 
