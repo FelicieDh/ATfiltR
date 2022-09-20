@@ -522,8 +522,8 @@ if (project==T){
 
   cat("\n")
 
-  ATfiltR_data.3[, Range.here := as.numeric(500)]
-  ATfiltR_data.3[, Range.previous := as.numeric(500)]
+  ATfiltR_data.3$Range.here<- as.numeric(500)
+  ATfiltR_data.3$Range.previous <- as.numeric(500)
 
   repeat{
 
