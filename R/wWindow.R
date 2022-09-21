@@ -743,7 +743,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
       colnames(animal)[which(colnames(animal) %in% c("Location"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Location"))])
     }
 
-    if (loc=="no"){
+    if (loc=="n"){
       animal$Location<-"ATfiltR_animal"
     } else {
     colnames(animal)[c(as.numeric(loc))]<-"Location"}
