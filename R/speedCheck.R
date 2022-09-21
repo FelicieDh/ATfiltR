@@ -507,7 +507,7 @@ if (project==T){
   reduced.dist<-dist.long
   reduced.range<-range
   ATfiltR_data.3[,Swim.speed :=(ATfiltR_data.3[,Swim.speed]*3600)]
-  ATfiltR_speedy.data<-data.table::data.table(a=NA, b=NA)
+  speedy.data<-data.table::data.table(a=NA, b=NA)
   t<-0
 
   # ATfiltR_data.3[, Previous.station := character()]
@@ -657,10 +657,10 @@ if (project==T){
         cat(crayon::cyan(ATfiltR_data.3[Distance.full>=eval(max.distance),.N]),"detections were spatially too far appart (max.distance set by user to", crayon::cyan(max.distance),").", " \n")
         if (ATfiltR_data.3[Distance.full>=eval(max.distance),.N]>0){
 
-          if (all(is.na(ATfiltR_speedy.data))){
-            ATfiltR_speedy.data<-ATfiltR_data.3[Distance.full>=eval(max.distance),]
+          if (all(is.na(speedy.data))){
+            speedy.data<-ATfiltR_data.3[Distance.full>=eval(max.distance),]
           } else {
-            ATfiltR_speedy.data<-rbind(ATfiltR_speedy.data, ATfiltR_data.3[Distance.full>=eval(max.distance),])
+            speedy.data<-rbind(speedy.data, ATfiltR_data.3[Distance.full>=eval(max.distance),])
           }
 
           ATfiltR_data.3<-ATfiltR_data.3[Distance.full<eval(max.distance) | is.na(Distance.full),]
@@ -672,10 +672,10 @@ if (project==T){
 
     else if (error.number > 0){
 
-      if (all(is.na(ATfiltR_speedy.data))){
-        ATfiltR_speedy.data<-ATfiltR_data.3[which(!is.na(Speed.error) & is.na(Previous.error)),]
+      if (all(is.na(speedy.data))){
+        speedy.data<-ATfiltR_data.3[which(!is.na(Speed.error) & is.na(Previous.error)),]
       } else {
-        ATfiltR_speedy.data<-rbind(ATfiltR_speedy.data, ATfiltR_data.3[which(!is.na(Speed.error) & is.na(Previous.error)),])
+        speedy.data<-rbind(speedy.data, ATfiltR_data.3[which(!is.na(Speed.error) & is.na(Previous.error)),])
       }
 
       ATfiltR_data.3<-ATfiltR_data.3[-which(!is.na(Speed.error) & is.na(Previous.error)),]
@@ -694,15 +694,15 @@ if (project==T){
 
 
   ATfiltR_data.4<<-ATfiltR_data.3
-  ATfiltR_speedy.data<<-ATfiltR_speedy.data
+  speedy.data<<-speedy.data
 
   if (save.speedy==TRUE){
     cat("Saving the data that happenned too fast ...", " \n")
     if (project==T){
-    save(ATfiltR_speedy.data, file=here::here(detection.folder, paste0("ATfiltR_speedy.data_", Sys.Date(),".RData")))
+    save(speedy.data, file=here::here(detection.folder, paste0("ATfiltR_speedy.data_", Sys.Date(),".RData")))
     cat(crayon::bold("File saved in your Detections folder under"), crayon::bold$cyan(paste0("ATfiltR_speedy.data_", Sys.Date(),".RData"), " \n"))
 } else{
-  save(ATfiltR_speedy.data, file=paste0(getwd(), "/ATfiltR_speedy.data_", Sys.Date(),".RData"))
+  save(speedy.data, file=paste0(getwd(), "/ATfiltR_speedy.data_", Sys.Date(),".RData"))
   cat(crayon::bold("File saved in "), crayon::bold$cyan(paste0(getwd(), "/ATfiltR_speedy.data_", Sys.Date(),".RData"), " \n"))}
 }
 

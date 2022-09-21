@@ -236,7 +236,7 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
   }
   cat("\n")
   cat("\n")
-  cat(crayon::bold$yellow("End of process for the Solo detection filtering. This took approximately", paste(round(difftime(Sys.time(), start, units="min"))), "minutes!"," \n"))
+  cat(crayon::bold$yellow("End of process for the Solo detection filtering. This took approximately", paste(round(difftime(Sys.time(), as.POSIXct(start), units="min"))), "minutes!"," \n"))
 
 
 
