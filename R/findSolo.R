@@ -195,7 +195,7 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
       cat("\n")
       cat("You chose to save the solo detections!", " \n")
       if(project==T){
-      save(solo.detections, file=here::here(detection.folder, paste0("ATfilter_solo_", Sys.Date(),".RData")))
+      save(solo.detections, file=here::here(detection.folder, paste0("ATfiltR_solo_", Sys.Date(),".RData")))
       cat(crayon::bold("File saved in your detections folder under"), crayon::bold$cyan(paste0("ATfilter_solo_", Sys.Date(),".RData")), crayon::bold$cyan(" \n"))
       } else {
         save(solo.detections, file=paste0(getwd(),"/ATfilter_solo_", Sys.Date(),".RData"))
