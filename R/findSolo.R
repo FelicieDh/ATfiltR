@@ -102,11 +102,11 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
 
 
       ATfiltR_data.2[ID == these.animals[i] &
-                       !Station.name %in% c("Implantation", "Active", "Inactive"), Time.after := shift(ATfiltR_data.2[ID == these.animals[i] &
-                                                                                                                        !Station.name %in% c("Implantation", "Active", "Inactive"),Date.and.Time], 1, type="lead")]
+                       !Station.name %in% c("Implantation", "Active", "Inactive"), Time.after := as.POSIXct(shift(ATfiltR_data.2[ID == these.animals[i] &
+                                                                                                                        !Station.name %in% c("Implantation", "Active", "Inactive"),Date.and.Time], 1, type="lead"))]
       ATfiltR_data.2[ID == these.animals[i] &
-                       !Station.name %in% c("Implantation", "Active", "Inactive"), Time.before := shift(ATfiltR_data.2[ID == these.animals[i] &
-                                                                                                                         !Station.name %in% c("Implantation", "Active", "Inactive"),Date.and.Time], 1)]
+                       !Station.name %in% c("Implantation", "Active", "Inactive"), Time.before := as.POSIXct(shift(ATfiltR_data.2[ID == these.animals[i] &
+                                                                                                                         !Station.name %in% c("Implantation", "Active", "Inactive"),Date.and.Time], 1))]
       if (per.receiver==T){
         receiverlist<-unique(ATfiltR_data.2[ID == these.animals[i] &
                                               !Station.name %in% c("Implantation", "Active", "Inactive"), Station.name])
@@ -114,12 +114,12 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
         for (j in 1:length(receiverlist)){
           ATfiltR_data.2[ID == these.animals[i] &
                            Station.name == receiverlist[j],
-                         Time.after.pR := shift(ATfiltR_data.2[ID == these.animals[i] &
-                                                                 Station.name == receiverlist[j],Date.and.Time], 1, type="lead")]
+                         Time.after.pR := as.POSIXct(shift(ATfiltR_data.2[ID == these.animals[i] &
+                                                                 Station.name == receiverlist[j],Date.and.Time], 1, type="lead"))]
           ATfiltR_data.2[ID == these.animals[i] &
                            Station.name == receiverlist[j],
-                         Time.before.pR := shift(ATfiltR_data.2[ID == these.animals[i] &
-                                                                  Station.name == receiverlist[j],Date.and.Time], 1)]
+                         Time.before.pR := as.POSIXct(shift(ATfiltR_data.2[ID == these.animals[i] &
+                                                                  Station.name == receiverlist[j],Date.and.Time], 1))]
         }
         }
       }
