@@ -93,6 +93,7 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
   cat("\n","\n",crayon::bold$underline$blue("Step 2: Calculating the delay between consecutive detections and defining solitary detections..."))
   cat("\n")
   cat("\n")
+
   these.animals<-unique(ATfiltR_data.2$ID)
   for (i in 1:length(these.animals)){
     if (ATfiltR_data.2[ID == these.animals[i],.N]<2) {

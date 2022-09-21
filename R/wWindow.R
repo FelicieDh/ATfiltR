@@ -721,7 +721,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
       cat("\n",crayon::bold("Is there a column corresponding to the identity of the location (correponding to the locations in the distance matrix for speed calculations), if yes, enter the [column number], otherwise enter [n]o"))
       loc<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
 
-      if (length(loc)==1 & loc=="no"){break}
+      if (length(loc)==1 & loc=="n"){break}
 
       if (length(loc)==1 & (suppressWarnings(as.numeric(ID)) %in% 1:as.numeric(ncol(animal)))){ ##check validity of ID
 
