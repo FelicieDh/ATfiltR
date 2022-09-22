@@ -75,7 +75,7 @@ knitr::kable(fakerange, Caption="Example of the ranges", booktabs = T)
 
 ```{r, eval=F}
 speedCheck(detection.folder="Detections", data.folder="Data",
-                     receiver.range=NA, base=1000, factor=NA, exponent=NA,
+                     receiver.range=NA, base=1000, factor.col=NA, exponent=NA,
                      max.distance=NA, save.speedy=TRUE, save=TRUE, project=TRUE,
                      data.file="data", ID.col="ID", DateTime.col="Date.and.Time",
                      Station.col="Station.name")
@@ -103,15 +103,15 @@ What is the range, in meters of the receivers? If your have a rnage table that y
 The base of the equation used for speed calculation (in m/s). For instance, if the speed is calculated is speed=2*body_length^0.015, the base is 2. If the speed is the same for all fish, for instance 10m/s, the base is 10.
 
 
-**factor**  
+**factor.col**  
 <hr />
 
-The column name for the data to use in the speed calculation. For instance, if speed=2*body_length^0.015, “factor” is the name of the column that contains the necessary body length data, in quotation marks `"body_length"`. If the speed doesn't depend on data in your dataset, keep as `NA`.
+The column name for the data to use in the speed calculation. For instance, if speed=2*body_length^0.015, “factor.col” is the name of the column that contains the necessary body length data, in quotation marks `"body_length"`. If the speed doesn't depend on data in your dataset, keep as `NA`.
 
 **exponent**  
 <hr />
 
-The exponent for the factor you indicated in your speed calculation. For instance, for speed=2*body_length^0.015, exponent is equal to 0.015
+The exponent for the factor.col you indicated in your speed calculation. For instance, for speed=2*body_length^0.015, exponent is equal to 0.015
 
 **max.distance**  
 <hr />

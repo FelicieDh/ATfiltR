@@ -7,9 +7,9 @@
 #' @param data.folder The name of the folder containing auxillary data (e.g. spatial data). Can be se same af detection.folder (Used if project==T)
 #' @param receiver.range Range of the receivers in meters (if the range is the same for all receivers and the whole study duration). Keep as NA if your range data is stored in a separate file (i.e. if you have different ranges for your stations).
 #' @param base The base of the equation you use for speed (in m/s). For instance if the speed is calculated is speed=2*body_length^0.015, the base is 2. If the speed is the same for all fish, for instance 10m/s, the base is 10.
-#' @param factor The column name for the data to use in the speed calculation. For instance is speed=2*body_length^0.015, indicate the name of the column that contains the necessary bodylength data, in quotation marks.
+#' @param factor.col The column name for the data to use in the speed calculation. For instance is speed=2*body_length^0.015, indicate the name of the column that contains the necessary bodylength data, in quotation marks.
 #' If the speed doesn't depend on data in your dataset, keep as NA.
-#' @param exponent The exponent for the factor you indicated in your speed calculation. For instance for speed=2*body_length^0.015, expononent is equal to 0.015
+#' @param exponent The exponent for the factor.col you indicated in your speed calculation. For instance for speed=2*body_length^0.015, expononent is equal to 0.015
 #' @param max.distance Maximum distance (in meters) that an animal may move, and beyond which the detections should be removed. Default: NA
 #' @param save.speedy Should the detections that happened too fast be saved in the detections folder? (TRUE or FALSE)
 #' @param save Should the data be saved in your detections folder (TRUE or FALSE)
@@ -28,7 +28,7 @@
 #' your detections folder and data folder your data must be compiled via
 #' compileData(), and filteres within withinWindow() and findSolo()
 #' speedCheck(detection.folder="Detections", data.folder="Data",
-#' receiver.range=NA, base=3600, factor=NA, exponent=NA, max.distance=NA,
+#' receiver.range=NA, base=3600, factor.col=NA, exponent=NA, max.distance=NA,
 #' save.speedy=TRUE, save=TRUE)
 #' }
 #' @export
@@ -50,7 +50,7 @@
 ############################################################################
 
 speedCheck<-function(detection.folder="Detections", data.folder="Data",
-                     receiver.range=NA, base=1000, factor=NA, exponent=NA,
+                     receiver.range=NA, base=1000, factor.col=NA, exponent=NA,
                      max.distance=NA, save.speedy=TRUE, save=TRUE, project=TRUE,
                      data.file="data", ID.col="ID", DateTime.col="Date.and.Time",
                      Station.col="Station.name"){
@@ -436,12 +436,12 @@ if (project==T){
 
   cat("Calculating swimming speeds... in meter per second", "\n")
 
-  if (is.na(factor) & is.na(exponent)){
+  if (is.na(factor.col) & is.na(exponent)){
     ATfiltR_data.3[,Swim.speed := eval(base)]
 
-  } else if (!is.na(factor)){
-    cat("You indicated that speed is to be calculated based on the animal's size in the column:", factor, "\n")
-    print(ATfiltR_data.3[1,eval(factor), with=FALSE])
+  } else if (!is.na(factor.col)){
+    cat("You indicated that speed is to be calculated based on the animal's size in the column:", factor.col, "\n")
+    print(ATfiltR_data.3[1,eval(factor.col), with=FALSE])
 
     repeat{
       cat("Please indicate by how much this needs to be multiplied for your results to be in meters", "\n")
@@ -453,8 +453,8 @@ if (project==T){
       if(!is.na(suppressWarnings(as.numeric(convert)))) { ##check validity of comvert
 
         cat("\n")
-        print(ATfiltR_data.3[1,eval(factor), with=FALSE])
-        print(ATfiltR_data.3[1,eval(factor), with=FALSE]*as.numeric(convert))
+        print(ATfiltR_data.3[1,eval(factor.col), with=FALSE])
+        print(ATfiltR_data.3[1,eval(factor.col), with=FALSE]*as.numeric(convert))
 
 
         repeat{
@@ -467,7 +467,7 @@ if (project==T){
         }
 
         if (check=="y"){
-          ATfiltR_data.3[,BL.calc := ATfiltR_data.3[,eval(factor), with=FALSE]*as.numeric(convert)]
+          ATfiltR_data.3[,BL.calc := ATfiltR_data.3[,eval(factor.col), with=FALSE]*as.numeric(convert)]
           break}} ##end of check validity of depl
 
     } ##end of r1 bracket
@@ -481,7 +481,7 @@ if (project==T){
   }
 
 
-  if (!is.na(factor)){
+  if (!is.na(factor.col)){
     repeat {
       cat(crayon::bold("Speed calculated: Please make sure these results seem to make sense", "\n"))
 
