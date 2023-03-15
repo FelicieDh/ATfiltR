@@ -805,6 +805,10 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
   for (i in 1:nrow(deployment)){
 
+    if (ATfiltR_data.1[Receiver == deployment[i,"Receiver"] &
+                       Date.and.Time > deployment[i,"Start"] &
+                       Date.and.Time < deployment[i,"Stop"], .N] == 0) next
+
     ATfiltR_data.1[Receiver == deployment[i,"Receiver"] &
                      Date.and.Time > deployment[i,"Start"] &
                      Date.and.Time < deployment[i,"Stop"],`:=` (Station.name = deployment[i,"Station.name"],
