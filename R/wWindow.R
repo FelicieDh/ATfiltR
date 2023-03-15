@@ -911,11 +911,11 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
       else if (animal[i,"Tag.status"]=="TagStart"){
       ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
-                       Date.and.Time >= animal[i,"Date"]+24*3600,ID := animal[i,"ID"]]
+                       Date.and.Time >= animal[i,"Date"]+as.numeric(discard.first)*3600,ID := animal[i,"ID"]]
 
       if (length(to.transfer) > 0){
         ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
-                         Date.and.Time >= animal[i,"Date"]+24*3600, colnames(animal)[to.transfer] := animal[i,to.transfer]]
+                         Date.and.Time >= animal[i,"Date"]+as.numeric(discard.first)*3600, colnames(animal)[to.transfer] := animal[i,to.transfer]]
       }
 
     }
