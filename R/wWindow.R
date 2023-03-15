@@ -930,7 +930,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
       }
 
     }
-    }
+
     cat(crayon::bold("Attributing tagged animals to their respective detections:"), crayon::bold$cyan(i), crayon::bold("/", nrow(animal), " \r"))
   }
   cat("\n")
