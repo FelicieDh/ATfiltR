@@ -639,13 +639,13 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
     repeat{ ##r22 ask for tag status
       cat("\n",crayon::bold("Is there a column with the tag status ? If yes, enter the column number [column number], else enter [n]o"))
-      cat("\n","\n","(Reminder: the tag status column allows us to distinguish the implantation of the tag
+      cat("\n","\n","(Reminder: the tag status column allows us to distinguish the start of the tag
         and the subsequent recaptures of the animal. If you don't have a tag status column, we will
-        consider that every row in you animal data frame is an implantation row (i.e., contains
+        consider that every row in you animal data frame is an start row (i.e., contains
         data on the animal on the day of tagging))")
-      cat("\n","\n","(Note: the tag status column has three possible entries. 'Implantation' for when the
-        animal is tagged. 'Active' for when the animal is resighted or recaptured and released alive with the transmitter.
-        'Inactive' for when the animal is resighted or recaptured and the transmitter and/or the animal removed.
+      cat("\n","\n","(Note: the tag status column has 5 possible entries. 'Pre-TagStart' for captures before the animal is tagged,
+      'TagStart' for when the animal is tagged. 'TagActive' for when the animal is resighted or recaptured and released alive with the transmitter.
+        'TagStop' for when the animal is resighted or recaptured and the transmitter and/or the animal removed, 'Post-TagStop' for potential recpatures after the tag stop date.
         If your dataset is a little different we will help you change it to fit the package...)")
 
 
@@ -653,12 +653,12 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
 
       if (length(check)==1 & tag.stat=="n"){
-        cat("\n",crayon::bold("No tag status column. Creating one, with every row being 'Implantation'."))
+        cat("\n",crayon::bold("No tag status column. Creating one, with every row being 'TagStart'."))
 
         if(length(colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])>0){ ##this makes sure there arent any other colummns called Date... It also renames the columns if they are the right ones, but we take care of it later
           colnames(animal)[which(colnames(animal) %in% c("Tag.status"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])
         }
-        animal$Tag.status<-"Implantation"
+        animal$Tag.status<-"TagStart"
         tag.stat<-as.numeric(ncol(animal))
 
         break ##break r22
@@ -681,12 +681,14 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
     } ##end of r22 bracket
 
 
-    if (any(!c(unique(as.character(animal[,c(as.numeric(tag.stat))]))) %in% c("Implantation","Active","Inactive"))){
-      cat("\n",crayon::bold("The content of the column is not 'Implantation', 'Active' and 'Inactive'"))
+    if (any(!c(unique(as.character(animal[,c(as.numeric(tag.stat))]))) %in% c("Pre-TagStart","TagStart","TagActive","TagStop","Post-TagStop"))){
+      cat("\n",crayon::bold("The content of the column is not 'Pre-TagStart','TagStart','TagActive','TagStop' or 'Post-TagStop'"))
       cat("\n","We will show you the contents of your column, for each of them, please indicate if they correspond to",
-          "\n",crayon::bold("[1] Implantation"), "(Data on the day the animal is tagged), each animal you tagged MUST have an implantation!",
-          "\n",crayon::bold("[2] Active"), "(A recapture or resigthing of the animal, released alive and with the transmitter)",
-          "\n",crayon::bold("[3] Inactive"), "(A recapture or resigthing of the animal where the transmitter and/or the animal was removed")
+          "\n",crayon::bold("[1] Pre-TagStart"), "(Data collected before the animal is tagged)",
+          "\n",crayon::bold("[2] TagStart"), "(Data on the day the animal is tagged), each animal you tagged MUST have an implantation!",
+          "\n",crayon::bold("[3] TagActive"), "(A recapture or resigthing of the animal, released alive and with the transmitter)",
+          "\n",crayon::bold("[4] TagStop"), "(A recapture or resigthing of the animal where the transmitter and/or the animal was removed, or the known end date of the tracking",
+          "\n",crayon::bold("[5] Post-TagStop"), "(A recapture or resigthing of the animal after the transmitter was removed or turned off")
 
       if(length(colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])>0){ ##this makes sure there arent any other colummns called Date... It also renames the columns if they are the right ones, but we take care of it later
         colnames(animal)[which(colnames(animal) %in% c("Tag.status"))]<-paste0("x.", colnames(animal)[which(colnames(animal) %in% c("Tag.status"))])
@@ -695,12 +697,12 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
           repeat{
             cat("\n",crayon::bold$yellow(unique(animal[,c(as.numeric(tag.stat))])[i]))
 
-            cat("\n",crayon::bold("[1] Implantation, [2] Active or [3] Inactive ?"))
+            cat("\n",crayon::bold("[1] Pre-TagStart, [2] TagStart, [3] TagActive, [4] TagStop or [5] Post-TagStop ?"))
 
             iter.tag<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
 
             if (length(iter.tag)==1 & suppressWarnings(as.numeric(iter.tag)) %in% c(1,2,3)){
-              animal[which(animal[,c(as.numeric(tag.stat))] == unique(animal[,c(as.numeric(tag.stat))])[i]), "Tag.status"] <- c("Implantation","Active","Inactive")[as.numeric(iter.tag)]
+              animal[which(animal[,c(as.numeric(tag.stat))] == unique(animal[,c(as.numeric(tag.stat))])[i]), "Tag.status"] <- c("Pre-TagStart","TagStart","TagActive","TagStop","Post-TagStop")[as.numeric(iter.tag)]
               break
             }
           }
@@ -897,7 +899,17 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
 
 
   for (i in 1:nrow(animal)){
-    if (animal[i,"Tag.status"]=="Implantation"){
+
+    if (animal[i,"Tag.status"]=="Pre-TagStart"){
+      ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
+                       Date.and.Time >= animal[i,"Date"],ID := NA]
+
+      if (length(to.transfer) > 0){
+        ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
+                         Date.and.Time >= animal[i,"Date"], colnames(animal)[to.transfer] := animal[i,to.transfer]]
+      }
+
+      else if (animal[i,"Tag.status"]=="TagStart"){
       ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
                        Date.and.Time >= animal[i,"Date"]+24*3600,ID := animal[i,"ID"]]
 
@@ -907,7 +919,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
       }
 
     }
-    else if (animal[i,"Tag.status"]=="Active"){
+    else if (animal[i,"Tag.status"]=="TagActive"){
       ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
                        Date.and.Time >= animal[i,"Date"],ID := animal[i,"ID"]]
 
@@ -915,7 +927,7 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
         ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
                          Date.and.Time >= animal[i,"Date"], colnames(animal)[to.transfer] := animal[i,to.transfer]]}
 
-    } else if (animal[i,"Tag.status"]=="Inactive"){
+    } else if (animal[i,"Tag.status"]=="TagStop"){
       ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
                        Date.and.Time == animal[i,"Date"],ID := animal[i,"ID"]]
       ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
@@ -924,9 +936,9 @@ wWindow<-function(detection.folder="Detections", data.folder="Data", sep.type=",
       if (length(to.transfer) > 0){
         ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
                          Date.and.Time == animal[i,"Date"], colnames(animal)[to.transfer] := animal[i,to.transfer]]
-        ATfiltR_data.1[Transmitter == animal[i,"Transmitter"] &
-                         Date.and.Time == animal[i,"Date"], colnames(animal)[to.transfer] := NA]}
+      }
 
+    }
     }
     cat(crayon::bold("Attributing tagged animals to their respective detections:"), crayon::bold$cyan(i), crayon::bold("/", nrow(animal), " \r"))
   }
