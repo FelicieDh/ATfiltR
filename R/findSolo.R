@@ -81,6 +81,7 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
 
     ATfiltR_data.2[,"Station.name"] <- as.character(ATfiltR_data.2[,which(colnames(ATfiltR_data.2)==Station.col) ])
 
+    tz<-attr(ATfiltR_data.2$Date.and.Time[1],"tzone")
 
     cat("Ordering the data chronologically...", " \n")
 
@@ -95,10 +96,10 @@ findSolo<-function(detection.folder="Detections", save.solo=T, save=T, per.recei
   cat("\n")
 
   these.animals<-unique(ATfiltR_data.2$ID)
-  ATfiltR_data.2$Time.before<-as.POSIXct(NA)
-  ATfiltR_data.2$Time.after<-as.POSIXct(NA)
-  ATfiltR_data.2$Time.before.pR<-as.POSIXct(NA)
-  ATfiltR_data.2$Time.after.pR<-as.POSIXct(NA)
+  ATfiltR_data.2$Time.before<-as.POSIXct(NA, tz=tz)
+  ATfiltR_data.2$Time.after<-as.POSIXct(NA, tz=tz)
+  ATfiltR_data.2$Time.before.pR<-as.POSIXct(NA, tz=tz)
+  ATfiltR_data.2$Time.after.pR<-as.POSIXct(NA, tz=tz)
 
   for (i in 1:length(these.animals)){
     if (ATfiltR_data.2[ID == these.animals[i],.N]<2) {
