@@ -393,7 +393,7 @@ if (project==T){
     cat("\n","(Note 2: If you don't have a distance matrix, you can manually create it or use distancesMatrix() from the package 'actel',
         making sure to set actel=F and saving it using write.table() with row.names=T. See ?distancesMatrix for more info (after having installed actel))")
 
-    distmat<-scan("",what="numeric",nmax=1,fill=T, quiet=T)
+    distmat<-scan("",what="numeric", nmax=2, fill=T, quiet=T)
 
     if(!is.na(suppressWarnings(as.numeric(distmat))) & suppressWarnings(as.numeric(distmat)) %in% 1:length(dir(here::here(data.folder), pattern=c(".txt|.csv")))) { ##check validity of depl
 if (project==T){

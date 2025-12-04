@@ -9,32 +9,48 @@ speedCheck(
   data.folder = "Data",
   receiver.range = NA,
   base = 1000,
-  factor = NA,
+  factor.col = NA,
   exponent = NA,
   max.distance = NA,
   save.speedy = TRUE,
-  save = TRUE
+  save = TRUE,
+  project = TRUE,
+  data.file = "data",
+  ID.col = "ID",
+  DateTime.col = "Date.and.Time",
+  Station.col = "Station.name"
 )
 }
 \arguments{
-\item{detection.folder}{The name of the folder containing the detection data}
+\item{detection.folder}{The name of the folder containing the detection data (Used if project==T)}
 
-\item{data.folder}{The name of the folder containing auxillary data (e.g. spatial data). Can be se same af detection.folder}
+\item{data.folder}{The name of the folder containing auxillary data (e.g. spatial data). Can be se same af detection.folder (Used if project==T)}
 
 \item{receiver.range}{Range of the receivers in meters (if the range is the same for all receivers and the whole study duration). Keep as NA if your range data is stored in a separate file (i.e. if you have different ranges for your stations).}
 
 \item{base}{The base of the equation you use for speed (in m/s). For instance if the speed is calculated is speed=2*body_length^0.015, the base is 2. If the speed is the same for all fish, for instance 10m/s, the base is 10.}
 
-\item{factor}{The column name for the data to use in the speed calculation. For instance is speed=2*body_length^0.015, indicate the name of the column that contains the necessary bodylength data, in quotation marks.
+\item{factor.col}{The column name for the data to use in the speed calculation. For instance is speed=2*body_length^0.015, indicate the name of the column that contains the necessary bodylength data, in quotation marks.
 If the speed doesn't depend on data in your dataset, keep as NA.}
 
-\item{exponent}{The exponent for the factor you indicated in your speed calculation. For instance for speed=2*body_length^0.015, expononent is equal to 0.015}
+\item{exponent}{The exponent for the factor.col you indicated in your speed calculation. For instance for speed=2*body_length^0.015, expononent is equal to 0.015}
 
 \item{max.distance}{Maximum distance (in meters) that an animal may move, and beyond which the detections should be removed. Default: NA}
 
 \item{save.speedy}{Should the detections that happened too fast be saved in the detections folder? (TRUE or FALSE)}
 
 \item{save}{Should the data be saved in your detections folder (TRUE or FALSE)}
+
+\item{project}{If TRUE (default) the work is done in your ATfiltR project.}
+
+\item{data.file}{The name of the data loaded in your R environment (used if project==F)}
+
+\item{ID.col}{The name of the column containing your animal IDs (used if project==F)}
+
+\item{DateTime.col}{The name of the column containing your Date.and.Time (used if project==F),
+the Date.and.Time must be in one of the following formats: "Ymd HMS", "ymd HMS","dmy HMS", "dmY HMS"}
+
+\item{Station.col}{The name of the column containing your stations ID (used if project==F)}
 }
 \value{
 A data frame object that contains the detections from your tags, filtered for speed, and another that contains the detections that were found to be occur too fast according to the user inputed speed.
@@ -48,7 +64,7 @@ Filters out detections that occur faster than the animal's speed (user provided)
 your detections folder and data folder your data must be compiled via
 compileData(), and filteres within withinWindow() and findSolo()
 speedCheck(detection.folder="Detections", data.folder="Data",
-receiver.range=NA, base=3600, factor=NA, exponent=NA, max.distance=NA,
+receiver.range=NA, base=3600, factor.col=NA, exponent=NA, max.distance=NA,
 save.speedy=TRUE, save=TRUE)
 }
 }
