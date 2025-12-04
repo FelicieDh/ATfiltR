@@ -45,7 +45,11 @@ You can install the development version of ATfiltR from
 remotes::install_github("FelicieDh/ATfiltR", build_opts = c("--no-resave-data", "--no-manual"), build_vignettes = TRUE) 
 ```
 
+<<<<<<< HEAD
 If this doesn’t work, you may also use with build_vignettes = FALSE:
+=======
+If this doesn't work, you may also use with build_vignettes = FALSE:
+>>>>>>> 47702b110c2f9e9532282ea237f1bb55730ddc91
 
 ``` r
 #install.packages("remotes") ##If remotes is not already installed
